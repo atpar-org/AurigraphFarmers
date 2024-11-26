@@ -37,6 +37,7 @@ public class LandOwnerServiceImpl implements LandOwnerService {
                     existing.setDate(updatedLandOwner.getDate());
                     existing.setEmail(updatedLandOwner.getEmail());
                     existing.setMobile(updatedLandOwner.getMobile());
+                    existing.setAddress(updatedLandOwner.getAddress());
                     return landOwnerRepository.save(existing);
                 });
     }

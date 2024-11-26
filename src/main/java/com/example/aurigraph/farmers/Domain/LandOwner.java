@@ -27,8 +27,19 @@ public class LandOwner {
     @Column(name = "signature")
     private String signature;  // Landowner Signature
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     @Column(name = "aadhar")
-    private String aadhar;  // Landowner Aadhar
+    private String aadhar;
+    // Landowner Aadhar
+    @Column(name = "address")
+    private String address;
 
     public String getLandownerName() {
         return landownerName;
