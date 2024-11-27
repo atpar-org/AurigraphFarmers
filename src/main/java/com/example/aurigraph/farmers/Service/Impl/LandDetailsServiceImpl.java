@@ -167,19 +167,39 @@ public class LandDetailsServiceImpl implements LandDetailsService {
         logger.info("Updating land details for ID: {}", id);
         return landDetailsRepository.findById(id)
                 .map(existing -> {
-                    existing.setAccountNumber(updatedDetails.getAccountNumber());
-                    existing.setAccountHolder(updatedDetails.getAccountHolder());
-                    existing.setDateCreated(updatedDetails.getDateCreated());
-                    existing.setIfscCode(updatedDetails.getIfscCode());
-                    existing.setSwiftCode(updatedDetails.getSwiftCode());
-                    existing.setBank(updatedDetails.getBank());
-                    existing.setBranch(updatedDetails.getBranch());
-                    existing.setAksmvbsMembershipNumber(updatedDetails.getAksmvbsMembershipNumber());
-                    existing.setGeoCoordinates(updatedDetails.getGeoCoordinates());
+                    if (updatedDetails.getAccountNumber() != null) {
+                        existing.setAccountNumber(updatedDetails.getAccountNumber());
+                    }
+                    if (updatedDetails.getAccountHolder() != null) {
+                        existing.setAccountHolder(updatedDetails.getAccountHolder());
+                    }
+                    if (updatedDetails.getDateCreated() != null) {
+                        existing.setDateCreated(updatedDetails.getDateCreated());
+                    }
+                    if (updatedDetails.getIfscCode() != null) {
+                        existing.setIfscCode(updatedDetails.getIfscCode());
+                    }
+                    if (updatedDetails.getSwiftCode() != null) {
+                        existing.setSwiftCode(updatedDetails.getSwiftCode());
+                    }
+                    if (updatedDetails.getBank() != null) {
+                        existing.setBank(updatedDetails.getBank());
+                    }
+                    if (updatedDetails.getBranch() != null) {
+                        existing.setBranch(updatedDetails.getBranch());
+                    }
+                    if (updatedDetails.getAksmvbsMembershipNumber() != null) {
+                        existing.setAksmvbsMembershipNumber(updatedDetails.getAksmvbsMembershipNumber());
+                    }
+                    if (updatedDetails.getGeoCoordinates() != null) {
+                        existing.setGeoCoordinates(updatedDetails.getGeoCoordinates());
+                    }
+
                     logger.debug("Updated land details for ID: {}", id);
                     return landDetailsRepository.save(existing);
                 });
     }
+
 
     @Override
     public boolean delete(Long id) {
