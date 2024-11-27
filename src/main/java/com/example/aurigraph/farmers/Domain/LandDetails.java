@@ -36,6 +36,17 @@ public class LandDetails {
     @Column(name = "aksmvbs_membership_number")
     private String aksmvbsMembershipNumber;  // Membership Number
 
+    @Column(name = "geo_coordinates")
+    private String geoCoordinates; // Stores "latitude,longitude"
+
+    public String getGeoCoordinates() {
+        return geoCoordinates;
+    }
+
+    public void setGeoCoordinates(String geoCoordinates) {
+        this.geoCoordinates = geoCoordinates;
+    }
+
 
     public Long getId() {
         return id;

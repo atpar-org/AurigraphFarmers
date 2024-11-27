@@ -27,7 +27,7 @@ public class LandDetailsMapping {
         completeLandDetailsDTO.setBank(landDetails.getBank());
         completeLandDetailsDTO.setBranch(landDetails.getBranch());
         completeLandDetailsDTO.setAksmvbsMembershipNumber(landDetails.getAksmvbsMembershipNumber());
-
+        completeLandDetailsDTO.setGeoCoordinates(landDetails.getGeoCoordinates());
         // Add additional mappings if needed
 
         return completeLandDetailsDTO;
@@ -50,7 +50,7 @@ public class LandDetailsMapping {
         landDetails.setBank(completeLandDetailsDTO.getBank());
         landDetails.setBranch(completeLandDetailsDTO.getBranch());
         landDetails.setAksmvbsMembershipNumber(completeLandDetailsDTO.getAksmvbsMembershipNumber());
-
+        landDetails.setGeoCoordinates(completeLandDetailsDTO.getGeoCoordinates());
         // Add additional mappings if needed
         // Example: If there are other fields that need to be mapped from DTO to entity
 

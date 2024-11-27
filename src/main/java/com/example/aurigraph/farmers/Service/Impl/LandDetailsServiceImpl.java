@@ -175,6 +175,7 @@ public class LandDetailsServiceImpl implements LandDetailsService {
                     existing.setBank(updatedDetails.getBank());
                     existing.setBranch(updatedDetails.getBranch());
                     existing.setAksmvbsMembershipNumber(updatedDetails.getAksmvbsMembershipNumber());
+                    existing.setGeoCoordinates(updatedDetails.getGeoCoordinates());
                     logger.debug("Updated land details for ID: {}", id);
                     return landDetailsRepository.save(existing);
                 });

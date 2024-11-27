@@ -138,4 +138,21 @@ public class CompleteLandDetailsDTO {
 
     private List<Witness> witnesses;
 
+
+    private String geoCoordinates; // Stores "latitude,longitude"
+    public String getGeoCoordinates() {
+        return geoCoordinates;
+    }
+
+    public void setGeoCoordinates(String geoCoordinates) {
+        this.geoCoordinates = geoCoordinates;
+    }
+
+    public Double getLatitude() {
+        return geoCoordinates != null ? Double.parseDouble(geoCoordinates.split(",")[0]) : null;
+    }
+
+    public Double getLongitude() {
+        return geoCoordinates != null ? Double.parseDouble(geoCoordinates.split(",")[1]) : null;
+    }
 }
