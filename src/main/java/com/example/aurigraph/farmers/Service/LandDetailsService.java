@@ -17,4 +17,6 @@ public interface LandDetailsService {
     Optional<LandDetails> update(Long id, LandDetails updatedDetails);
 
     boolean delete(Long id);
+
+    List<CompleteLandDetailsDTO> findByUserId(Integer userId);
 }

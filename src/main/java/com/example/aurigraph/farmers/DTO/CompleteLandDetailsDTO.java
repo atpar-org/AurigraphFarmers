@@ -4,10 +4,14 @@ import com.example.aurigraph.farmers.Domain.LandOwner;
 import com.example.aurigraph.farmers.Domain.PropertyDetails;
 import com.example.aurigraph.farmers.Domain.Witness;
 import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
+
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -130,7 +134,7 @@ public class CompleteLandDetailsDTO {
     private String branch;  // Branch name
 
 
-    private String aksmvbsMembershipNumber;  // Membership Number
+    private String aksmvbsMembershipNumber;// Membership Number
 
     private List<LandOwner> landOwners;
 
@@ -138,6 +142,56 @@ public class CompleteLandDetailsDTO {
 
     private List<Witness> witnesses;
 
+    private Integer userId;
+
+    private String createdBy;
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Timestamp getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Timestamp createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Timestamp getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Timestamp lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    private Timestamp createdDate ;
+
+
+    private String lastModifiedBy;
+
+    private Timestamp lastModifiedDate ;
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
 
     private String geoCoordinates; // Stores "latitude,longitude"
     public String getGeoCoordinates() {

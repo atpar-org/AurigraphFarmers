@@ -1,13 +1,14 @@
 package com.example.aurigraph.farmers.Domain;
 
 
+import com.example.aurigraph.farmers.AbstractAuditingEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "land_details")
-public class LandDetails {
+public class LandDetails extends AbstractAuditingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +39,18 @@ public class LandDetails {
 
     @Column(name = "geo_coordinates")
     private String geoCoordinates; // Stores "latitude,longitude"
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false) // Foreign key to the User table
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public String getGeoCoordinates() {
         return geoCoordinates;

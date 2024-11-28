@@ -1,5 +1,6 @@
 package com.example.aurigraph.farmers.Domain;
 
+import com.example.aurigraph.farmers.AbstractAuditingEntity;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -7,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 @Entity
 @Table(name = "land_owner")
-public class LandOwner {
+public class LandOwner extends AbstractAuditingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

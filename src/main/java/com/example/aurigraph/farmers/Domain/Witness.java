@@ -1,12 +1,13 @@
 package com.example.aurigraph.farmers.Domain;
 
+import com.example.aurigraph.farmers.AbstractAuditingEntity;
 import jakarta.persistence.*;
 
 import java.util.Date;
 
 @Entity
 @Table(name = "witness")
-public class Witness {
+public class Witness extends AbstractAuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

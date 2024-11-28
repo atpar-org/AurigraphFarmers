@@ -2,6 +2,9 @@ package com.example.aurigraph.farmers.Mapping;
 
 import com.example.aurigraph.farmers.DTO.CompleteLandDetailsDTO;
 import com.example.aurigraph.farmers.Domain.LandDetails;
+import com.example.aurigraph.farmers.Domain.User;
+import com.example.aurigraph.farmers.Repository.UserRepository;
+import com.example.aurigraph.farmers.Security.SecurityUtils;
 import org.springframework.stereotype.Component;
 
 
@@ -9,6 +12,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class LandDetailsMapping {
 
+
+    private final UserRepository userRepository;
+
+    public LandDetailsMapping(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public CompleteLandDetailsDTO domainToDTO(LandDetails landDetails) {
         if (landDetails == null) {
@@ -28,6 +37,11 @@ public class LandDetailsMapping {
         completeLandDetailsDTO.setBranch(landDetails.getBranch());
         completeLandDetailsDTO.setAksmvbsMembershipNumber(landDetails.getAksmvbsMembershipNumber());
         completeLandDetailsDTO.setGeoCoordinates(landDetails.getGeoCoordinates());
+        completeLandDetailsDTO.setUserId(landDetails.getUser().getId());
+        completeLandDetailsDTO.setCreatedBy(landDetails.getCreatedBy());
+        completeLandDetailsDTO.setCreatedDate(landDetails.getCreatedDate());
+        completeLandDetailsDTO.setLastModifiedBy(landDetails.getLastModifiedBy());
+        completeLandDetailsDTO.setLastModifiedDate(landDetails.getLastModifiedDate());
         // Add additional mappings if needed
 
         return completeLandDetailsDTO;
@@ -40,6 +54,9 @@ public class LandDetailsMapping {
 
         LandDetails landDetails = new LandDetails();
 
+        String currentUser = SecurityUtils.getCurrentUserLogin();
+
+        User user  = userRepository.findByEmail(currentUser).orElse(null);
         // Map simple fields
         landDetails.setId(completeLandDetailsDTO.getId());
         landDetails.setAccountNumber(completeLandDetailsDTO.getAccountNumber());
@@ -51,6 +68,8 @@ public class LandDetailsMapping {
         landDetails.setBranch(completeLandDetailsDTO.getBranch());
         landDetails.setAksmvbsMembershipNumber(completeLandDetailsDTO.getAksmvbsMembershipNumber());
         landDetails.setGeoCoordinates(completeLandDetailsDTO.getGeoCoordinates());
+        landDetails.setUser(user);
+
         // Add additional mappings if needed
         // Example: If there are other fields that need to be mapped from DTO to entity
 

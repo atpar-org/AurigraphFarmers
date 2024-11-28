@@ -1,11 +1,12 @@
 package com.example.aurigraph.farmers.Domain;
 
+import com.example.aurigraph.farmers.AbstractAuditingEntity;
 import jakarta.persistence.*;
 
 
 @Entity
 @Table(name = "property_details")
-public class PropertyDetails {
+public class PropertyDetails extends AbstractAuditingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

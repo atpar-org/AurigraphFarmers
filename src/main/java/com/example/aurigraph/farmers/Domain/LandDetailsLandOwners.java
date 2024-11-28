@@ -1,11 +1,12 @@
 package com.example.aurigraph.farmers.Domain;
 
 
+import com.example.aurigraph.farmers.AbstractAuditingEntity;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "land_details_land_owners")
-public class LandDetailsLandOwners {
+public class LandDetailsLandOwners extends AbstractAuditingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +32,7 @@ public class LandDetailsLandOwners {
     @Column(name = "land_details_id", nullable = false)
     private Long landDetailsId;
 
-    @Column(name = "land_owner_id", nullable = false)
+    @Column(name = "land_ownedockerr_id", nullable = false)
     private Long landOwnerId;
 
     // Getters and Setters
