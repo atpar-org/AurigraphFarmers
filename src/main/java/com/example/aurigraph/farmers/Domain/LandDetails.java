@@ -37,7 +37,7 @@ public class LandDetails extends AbstractAuditingEntity {
     @Column(name = "aksmvbs_membership_number")
     private String aksmvbsMembershipNumber;  // Membership Number
 
-    @Column(name = "geo_coordinates")
+    @Column(name = "geo_coordinates" ,nullable = true)
     private String geoCoordinates; // Stores "latitude,longitude"
 
     @ManyToOne(fetch = FetchType.LAZY)

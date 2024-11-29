@@ -202,11 +202,11 @@ public class CompleteLandDetailsDTO {
         this.geoCoordinates = geoCoordinates;
     }
 
-    public Double getLatitude() {
-        return geoCoordinates != null ? Double.parseDouble(geoCoordinates.split(",")[0]) : null;
+    public String getLatitude() {
+        return geoCoordinates != null ? geoCoordinates.split(",")[0] : null;
     }
 
-    public Double getLongitude() {
-        return geoCoordinates != null ? Double.parseDouble(geoCoordinates.split(",")[1]) : null;
+    public String getLongitude() {
+        return geoCoordinates != null ? geoCoordinates.split(",")[1] : null;
     }
 }
