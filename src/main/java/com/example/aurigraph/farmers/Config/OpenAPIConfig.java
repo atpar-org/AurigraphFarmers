@@ -28,7 +28,7 @@ public class OpenAPIConfig {
         devServer.setDescription("Server URL in Development environment");
 
         Info info = new Info()
-                .title("BookHealthServiceOnline API")
+                .title("AurigraphFarmers API")
                 .version("1.0");
 
         return new OpenAPI()
