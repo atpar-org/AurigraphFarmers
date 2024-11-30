@@ -42,6 +42,8 @@ public class LandDetailsMapping {
         completeLandDetailsDTO.setCreatedDate(landDetails.getCreatedDate());
         completeLandDetailsDTO.setLastModifiedBy(landDetails.getLastModifiedBy());
         completeLandDetailsDTO.setLastModifiedDate(landDetails.getLastModifiedDate());
+        completeLandDetailsDTO.setApproved(landDetails.isApproved());
+        completeLandDetailsDTO.setApproverName(landDetails.getApproverName());
         // Add additional mappings if needed
 
         return completeLandDetailsDTO;
@@ -68,6 +70,8 @@ public class LandDetailsMapping {
         landDetails.setBranch(completeLandDetailsDTO.getBranch());
         landDetails.setAksmvbsMembershipNumber(completeLandDetailsDTO.getAksmvbsMembershipNumber());
         landDetails.setGeoCoordinates(completeLandDetailsDTO.getGeoCoordinates());
+        landDetails.setApproved(completeLandDetailsDTO.isApproved());
+        landDetails.setApproverName(completeLandDetailsDTO.getApproverName());
         landDetails.setUser(user);
 
         // Add additional mappings if needed

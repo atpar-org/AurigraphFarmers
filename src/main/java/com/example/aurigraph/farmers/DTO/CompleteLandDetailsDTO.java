@@ -115,6 +115,8 @@ public class CompleteLandDetailsDTO {
         this.witnesses = witnesses;
     }
 
+
+
     private String accountNumber;  // Account number
 
 
@@ -144,7 +146,27 @@ public class CompleteLandDetailsDTO {
 
     private Integer userId;
 
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
+    }
+
+    public String getApproverName() {
+        return approverName;
+    }
+
+    public void setApproverName(String approverName) {
+        this.approverName = approverName;
+    }
+
     private String createdBy;
+
+    private boolean approved;
+
+    private String approverName;
 
     public String getCreatedBy() {
         return createdBy;

@@ -11,6 +11,8 @@ import java.util.List;
 
 @Repository
 public interface LandDetailsRepository extends CrudRepository<LandDetails, Long> {
+
     List<LandDetails> findLandDetailsByUserId(Integer userId);
+
 
 }

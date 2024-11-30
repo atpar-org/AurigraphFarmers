@@ -44,6 +44,29 @@ public class LandDetails extends AbstractAuditingEntity {
     @JoinColumn(name = "user_id", nullable = false) // Foreign key to the User table
     private User user;
 
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
+    }
+
+    public String getApproverName() {
+        return approverName;
+    }
+
+    public void setApproverName(String approverName) {
+        this.approverName = approverName;
+    }
+
+    @Column(name = "approved")
+    private boolean approved = false;
+
+    @Column(name = "approverName")
+    private String approverName;
+
+
     public User getUser() {
         return user;
     }

@@ -216,6 +216,7 @@ public class LandDetailsServiceImpl implements LandDetailsService {
                     if (updatedDetails.getGeoCoordinates() != null) {
                         existing.setGeoCoordinates(updatedDetails.getGeoCoordinates());
                     }
+
                     existing.setLastModifiedBy(currentUser);
                     logger.debug("Updated land details for ID: {}", id);
                     return landDetailsRepository.save(existing);
