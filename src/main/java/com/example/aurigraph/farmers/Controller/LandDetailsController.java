@@ -125,7 +125,6 @@ public class LandDetailsController {
         List<CompleteLandDetailsDTO> resultList = new ArrayList<>();
 
         try {
-
             CompleteLandDetailsDTO savedLandDetails = landDetailsService.save(completeLandDetailsDTO);
             resultList.add(savedLandDetails);
             responseVO.setStatus(201);
