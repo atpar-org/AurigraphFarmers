@@ -101,8 +101,12 @@ public class LandDetailsServiceImpl implements LandDetailsService {
                 landOwners.add(landOwner);
             }
         }
+        List<PropertyDetails> propertyDetails = propertyDetailsService.findByLandDetailsId(landDetail.getId());
+        List<Witness> witnesses = witnessService.findByLandDetailsId(landDetail.getId());
 
         completeLandDetailsDTO.setLandOwners(landOwners);
+        completeLandDetailsDTO.setPropertyDetails(propertyDetails);
+        completeLandDetailsDTO.setWitnesses(witnesses);
         logger.info("Completed fetching land details for ID: {}", id);
         return completeLandDetailsDTO;
     }
