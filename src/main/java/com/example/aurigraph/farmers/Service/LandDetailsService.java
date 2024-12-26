@@ -1,22 +1,23 @@
 package com.example.aurigraph.farmers.Service;
 
 
-import com.example.aurigraph.farmers.DTO.CompleteLandDetailsDTO;
+import com.example.aurigraph.farmers.DTO.CompleteLandDetailsInDTO;
+import com.example.aurigraph.farmers.DTO.CompleteLandDetailsOutDTO;
 import com.example.aurigraph.farmers.Domain.LandDetails;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface LandDetailsService {
-    List<CompleteLandDetailsDTO> findAll();
+    List<CompleteLandDetailsOutDTO> findAll();
 
-    CompleteLandDetailsDTO findById(Long id);
+    CompleteLandDetailsOutDTO findById(Long id);
 
-    CompleteLandDetailsDTO save(CompleteLandDetailsDTO completeLandDetailsDTO);
+    CompleteLandDetailsOutDTO save(CompleteLandDetailsInDTO completeLandDetailsInDTO);
 
     Optional<LandDetails> update(Long id, LandDetails updatedDetails);
 
     boolean delete(Long id);
 
-    List<CompleteLandDetailsDTO> findByUserId(Integer userId);
+    List<CompleteLandDetailsOutDTO> findByUserId(Integer userId);
 }

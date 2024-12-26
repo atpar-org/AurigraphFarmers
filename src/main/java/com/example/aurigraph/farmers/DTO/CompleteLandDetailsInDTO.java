@@ -3,19 +3,13 @@ package com.example.aurigraph.farmers.DTO;
 import com.example.aurigraph.farmers.Domain.LandOwner;
 import com.example.aurigraph.farmers.Domain.PropertyDetails;
 import com.example.aurigraph.farmers.Domain.Witness;
-import jakarta.persistence.Column;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
-public class CompleteLandDetailsDTO {
+public class CompleteLandDetailsInDTO {
 
     private Long id;
 
@@ -91,11 +85,11 @@ public class CompleteLandDetailsDTO {
         this.aksmvbsMembershipNumber = aksmvbsMembershipNumber;
     }
 
-    public List<LandOwner> getLandOwners() {
+    public List<LandOwnerDTO> getLandOwners() {
         return landOwners;
     }
 
-    public void setLandOwners(List<LandOwner> landOwners) {
+    public void setLandOwners(List<LandOwnerDTO> landOwners) {
         this.landOwners = landOwners;
     }
 
@@ -132,13 +126,22 @@ public class CompleteLandDetailsDTO {
 
     private String bank;  // Bank name
 
+    public MultipartFile getBankDetailsUpload() {
+        return BankDetailsUpload;
+    }
+
+    public void setBankDetailsUpload(MultipartFile bankDetailsUpload) {
+        BankDetailsUpload = bankDetailsUpload;
+    }
+
+    private MultipartFile BankDetailsUpload;
 
     private String branch;  // Branch name
 
 
     private String aksmvbsMembershipNumber;// Membership Number
 
-    private List<LandOwner> landOwners;
+    private List<LandOwnerDTO> landOwners;
 
     private List<PropertyDetails> propertyDetails;
 
@@ -146,7 +149,7 @@ public class CompleteLandDetailsDTO {
 
     private Integer userId;
 
-    public boolean isApproved() {
+    public boolean isApproved(){
         return approved;
     }
 
@@ -224,11 +227,4 @@ public class CompleteLandDetailsDTO {
         this.geoCoordinates = geoCoordinates;
     }
 
-    public String getLatitude() {
-        return geoCoordinates != null ? geoCoordinates.split(",")[0] : null;
-    }
-
-    public String getLongitude() {
-        return geoCoordinates != null ? geoCoordinates.split(",")[1] : null;
-    }
 }

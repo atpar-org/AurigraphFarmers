@@ -1,20 +1,23 @@
 package com.example.aurigraph.farmers.Controller;
 
-import com.example.aurigraph.farmers.DTO.CompleteLandDetailsDTO;
+import com.example.aurigraph.farmers.DTO.CompleteLandDetailsInDTO;
+import com.example.aurigraph.farmers.DTO.CompleteLandDetailsOutDTO;
 import com.example.aurigraph.farmers.Domain.User;
 import com.example.aurigraph.farmers.Repository.UserRepository;
 import com.example.aurigraph.farmers.Response.ResponseVO;
 import com.example.aurigraph.farmers.Security.SecurityUtils;
 import com.example.aurigraph.farmers.Service.LandDetailsService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 @RestController
@@ -32,11 +35,11 @@ public class LandDetailsController {
     }
 
     @GetMapping
-    public ResponseVO<CompleteLandDetailsDTO> getAllLandDetails() {
+    public ResponseVO<CompleteLandDetailsOutDTO> getAllLandDetails() {
         logger.info("Request received to fetch all land details");
-        ResponseVO<CompleteLandDetailsDTO> responseVO = new ResponseVO<>();
+        ResponseVO<CompleteLandDetailsOutDTO> responseVO = new ResponseVO<>();
         try {
-            List<CompleteLandDetailsDTO> landDetails = landDetailsService.findAll();
+            List<CompleteLandDetailsOutDTO> landDetails = landDetailsService.findAll();
             if (landDetails.isEmpty()) {
                 responseVO.setStatus(404);
                 responseVO.setMessage("No land details found.");
@@ -55,12 +58,12 @@ public class LandDetailsController {
     }
 
     @GetMapping("/by-user/{userId}")
-    public ResponseVO<CompleteLandDetailsDTO> getAllLandDetailsByUser(@PathVariable int userId) {
+    public ResponseVO<CompleteLandDetailsOutDTO> getAllLandDetailsByUser(@PathVariable int userId) {
         logger.info("Request received to fetch land details for user ID: {}", userId);
-        ResponseVO<CompleteLandDetailsDTO> responseVO = new ResponseVO<>();
-        List<CompleteLandDetailsDTO> resultList = new ArrayList<>();
+        ResponseVO<CompleteLandDetailsOutDTO> responseVO = new ResponseVO<>();
+        List<CompleteLandDetailsOutDTO> resultList = new ArrayList<>();
         try {
-            List<CompleteLandDetailsDTO> landDetails = landDetailsService.findByUserId(userId);
+            List<CompleteLandDetailsOutDTO> landDetails = landDetailsService.findByUserId(userId);
             if (landDetails!= null) {
                 String currentUser = SecurityUtils.getCurrentUserLogin();
                 User user = userRepository.findByEmail(currentUser).orElse(null);
@@ -87,12 +90,12 @@ public class LandDetailsController {
 
 
     @GetMapping("/{id}")
-    public ResponseVO<CompleteLandDetailsDTO> getLandDetailsById(@PathVariable Long id) {
+    public ResponseVO<CompleteLandDetailsOutDTO> getLandDetailsById(@PathVariable Long id) {
         logger.info("Request received to fetch land details for ID: {}", id);
-        ResponseVO<CompleteLandDetailsDTO> responseVO = new ResponseVO<>();
-        List<CompleteLandDetailsDTO> resultList = new ArrayList<>();
+        ResponseVO<CompleteLandDetailsOutDTO> responseVO = new ResponseVO<>();
+        List<CompleteLandDetailsOutDTO> resultList = new ArrayList<>();
         try {
-            CompleteLandDetailsDTO completeLandDetailsDTO = landDetailsService.findById(id);
+            CompleteLandDetailsOutDTO completeLandDetailsDTO = landDetailsService.findById(id);
             if (completeLandDetailsDTO != null) {
                 String currentUser = SecurityUtils.getCurrentUserLogin();
                 User user = userRepository.findByEmail(currentUser).orElse(null);
@@ -118,15 +121,16 @@ public class LandDetailsController {
     }
 
 
-    @PostMapping
-    public ResponseVO<CompleteLandDetailsDTO> createLandDetails(@RequestBody CompleteLandDetailsDTO completeLandDetailsDTO) {
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseVO<CompleteLandDetailsOutDTO> createLandDetails(@Valid @ModelAttribute BindingResult bindingResult, CompleteLandDetailsInDTO completeLandDetailsInDTO) {
         logger.info("Request received to create land details");
-        ResponseVO<CompleteLandDetailsDTO> responseVO = new ResponseVO<>();
-        List<CompleteLandDetailsDTO> resultList = new ArrayList<>();
+        ResponseVO<CompleteLandDetailsOutDTO> responseVO = new ResponseVO<>();
+        List<CompleteLandDetailsOutDTO> resultList = new ArrayList<>();
 
         try {
 
-            CompleteLandDetailsDTO savedLandDetails = landDetailsService.save(completeLandDetailsDTO);
+            CompleteLandDetailsOutDTO savedLandDetails = landDetailsService.save(completeLandDetailsInDTO);
             resultList.add(savedLandDetails);
             responseVO.setStatus(201);
             responseVO.setMessage("Land details created successfully.");

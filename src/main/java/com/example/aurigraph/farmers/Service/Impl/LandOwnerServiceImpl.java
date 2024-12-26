@@ -33,7 +33,7 @@ public class LandOwnerServiceImpl implements LandOwnerService {
                 .map(existing -> {
                     existing.setLandownerName(updatedLandOwner.getLandownerName());
                     existing.setSignature(updatedLandOwner.getSignature());
-                    existing.setAadhar(updatedLandOwner.getAadhar());
+                    existing.setAadhaar(updatedLandOwner.getAadhaar());
                     existing.setDate(updatedLandOwner.getDate());
                     existing.setEmail(updatedLandOwner.getEmail());
                     existing.setMobile(updatedLandOwner.getMobile());

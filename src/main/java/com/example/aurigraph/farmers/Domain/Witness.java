@@ -1,8 +1,10 @@
 package com.example.aurigraph.farmers.Domain;
 
 import com.example.aurigraph.farmers.AbstractAuditingEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -38,7 +40,7 @@ public class Witness extends AbstractAuditingEntity {
         this.note = note;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
@@ -50,7 +52,7 @@ public class Witness extends AbstractAuditingEntity {
         this.landDetailsId = landDetailsId;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -74,5 +76,6 @@ public class Witness extends AbstractAuditingEntity {
     private String note;
 
     @Column(name = "date", nullable = false)
-    private Date date;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate date;
 }

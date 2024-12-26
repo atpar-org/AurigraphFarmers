@@ -1,6 +1,7 @@
 package com.example.aurigraph.farmers.Mapping;
 
-import com.example.aurigraph.farmers.DTO.CompleteLandDetailsDTO;
+import com.example.aurigraph.farmers.DTO.CompleteLandDetailsInDTO;
+import com.example.aurigraph.farmers.DTO.CompleteLandDetailsOutDTO;
 import com.example.aurigraph.farmers.Domain.LandDetails;
 import com.example.aurigraph.farmers.Domain.User;
 import com.example.aurigraph.farmers.Repository.UserRepository;
@@ -19,38 +20,38 @@ public class LandDetailsMapping {
         this.userRepository = userRepository;
     }
 
-    public CompleteLandDetailsDTO domainToDTO(LandDetails landDetails) {
+    public CompleteLandDetailsOutDTO domainToDTO(LandDetails landDetails) {
         if (landDetails == null) {
             return null; // Handle null case to prevent NullPointerException
         }
 
-        CompleteLandDetailsDTO completeLandDetailsDTO = new CompleteLandDetailsDTO();
+        CompleteLandDetailsOutDTO completeLandDetailsOutDTO = new CompleteLandDetailsOutDTO();
 
         // Map simple fields
-        completeLandDetailsDTO.setId(landDetails.getId());
-        completeLandDetailsDTO.setAccountNumber(landDetails.getAccountNumber());
-        completeLandDetailsDTO.setAccountHolder(landDetails.getAccountHolder());
-        completeLandDetailsDTO.setDateCreated(landDetails.getDateCreated());
-        completeLandDetailsDTO.setIfscCode(landDetails.getIfscCode());
-        completeLandDetailsDTO.setSwiftCode(landDetails.getSwiftCode());
-        completeLandDetailsDTO.setBank(landDetails.getBank());
-        completeLandDetailsDTO.setBranch(landDetails.getBranch());
-        completeLandDetailsDTO.setAksmvbsMembershipNumber(landDetails.getAksmvbsMembershipNumber());
-        completeLandDetailsDTO.setGeoCoordinates(landDetails.getGeoCoordinates());
-        completeLandDetailsDTO.setUserId(landDetails.getUser().getId());
-        completeLandDetailsDTO.setCreatedBy(landDetails.getCreatedBy());
-        completeLandDetailsDTO.setCreatedDate(landDetails.getCreatedDate());
-        completeLandDetailsDTO.setLastModifiedBy(landDetails.getLastModifiedBy());
-        completeLandDetailsDTO.setLastModifiedDate(landDetails.getLastModifiedDate());
-        completeLandDetailsDTO.setApproved(landDetails.isApproved());
-        completeLandDetailsDTO.setApproverName(landDetails.getApproverName());
+        completeLandDetailsOutDTO.setId(landDetails.getId());
+        completeLandDetailsOutDTO.setAccountNumber(landDetails.getAccountNumber());
+        completeLandDetailsOutDTO.setAccountHolder(landDetails.getAccountHolder());
+        completeLandDetailsOutDTO.setDateCreated(landDetails.getDateCreated());
+        completeLandDetailsOutDTO.setIfscCode(landDetails.getIfscCode());
+        completeLandDetailsOutDTO.setSwiftCode(landDetails.getSwiftCode());
+        completeLandDetailsOutDTO.setBank(landDetails.getBank());
+        completeLandDetailsOutDTO.setBranch(landDetails.getBranch());
+        completeLandDetailsOutDTO.setAksmvbsMembershipNumber(landDetails.getAksmvbsMembershipNumber());
+        completeLandDetailsOutDTO.setGeoCoordinates(landDetails.getGeoCoordinates());
+        completeLandDetailsOutDTO.setUserId(landDetails.getUser().getId());
+        completeLandDetailsOutDTO.setCreatedBy(landDetails.getCreatedBy());
+        completeLandDetailsOutDTO.setCreatedDate(landDetails.getCreatedDate());
+        completeLandDetailsOutDTO.setLastModifiedBy(landDetails.getLastModifiedBy());
+        completeLandDetailsOutDTO.setLastModifiedDate(landDetails.getLastModifiedDate());
+        completeLandDetailsOutDTO.setApproved(landDetails.isApproved());
+        completeLandDetailsOutDTO.setApproverName(landDetails.getApproverName());
         // Add additional mappings if needed
 
-        return completeLandDetailsDTO;
+        return completeLandDetailsOutDTO;
     }
 
-    public LandDetails dtoToDomain(CompleteLandDetailsDTO completeLandDetailsDTO) {
-        if (completeLandDetailsDTO == null) {
+    public LandDetails dtoToDomain(CompleteLandDetailsInDTO completeLandDetailsInDTO) {
+        if (completeLandDetailsInDTO == null) {
             return null; // Handle null case to prevent NullPointerException
         }
 
@@ -60,18 +61,18 @@ public class LandDetailsMapping {
 
         User user  = userRepository.findByEmail(currentUser).orElse(null);
         // Map simple fields
-        landDetails.setId(completeLandDetailsDTO.getId());
-        landDetails.setAccountNumber(completeLandDetailsDTO.getAccountNumber());
-        landDetails.setAccountHolder(completeLandDetailsDTO.getAccountHolder());
-        landDetails.setDateCreated(completeLandDetailsDTO.getDateCreated());
-        landDetails.setIfscCode(completeLandDetailsDTO.getIfscCode());
-        landDetails.setSwiftCode(completeLandDetailsDTO.getSwiftCode());
-        landDetails.setBank(completeLandDetailsDTO.getBank());
-        landDetails.setBranch(completeLandDetailsDTO.getBranch());
-        landDetails.setAksmvbsMembershipNumber(completeLandDetailsDTO.getAksmvbsMembershipNumber());
-        landDetails.setGeoCoordinates(completeLandDetailsDTO.getGeoCoordinates());
-        landDetails.setApproved(completeLandDetailsDTO.isApproved());
-        landDetails.setApproverName(completeLandDetailsDTO.getApproverName());
+        landDetails.setId(completeLandDetailsInDTO.getId());
+        landDetails.setAccountNumber(completeLandDetailsInDTO.getAccountNumber());
+        landDetails.setAccountHolder(completeLandDetailsInDTO.getAccountHolder());
+        landDetails.setDateCreated(completeLandDetailsInDTO.getDateCreated());
+        landDetails.setIfscCode(completeLandDetailsInDTO.getIfscCode());
+        landDetails.setSwiftCode(completeLandDetailsInDTO.getSwiftCode());
+        landDetails.setBank(completeLandDetailsInDTO.getBank());
+        landDetails.setBranch(completeLandDetailsInDTO.getBranch());
+        landDetails.setAksmvbsMembershipNumber(completeLandDetailsInDTO.getAksmvbsMembershipNumber());
+        landDetails.setGeoCoordinates(completeLandDetailsInDTO.getGeoCoordinates());
+        landDetails.setApproved(completeLandDetailsInDTO.isApproved());
+        landDetails.setApproverName(completeLandDetailsInDTO.getApproverName());
         landDetails.setUser(user);
 
         // Add additional mappings if needed

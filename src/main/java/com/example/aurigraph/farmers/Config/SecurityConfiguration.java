@@ -37,6 +37,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/swagger/**").permitAll()
                 .requestMatchers("/Aurigaph-Farmers-api-docs/**").permitAll()
+                .requestMatchers("/images/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

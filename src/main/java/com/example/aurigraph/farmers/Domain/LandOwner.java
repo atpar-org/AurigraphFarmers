@@ -1,10 +1,13 @@
 package com.example.aurigraph.farmers.Domain;
 
 import com.example.aurigraph.farmers.AbstractAuditingEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 @Entity
 @Table(name = "land_owner")
@@ -36,9 +39,39 @@ public class LandOwner extends AbstractAuditingEntity {
         this.address = address;
     }
 
-    @Column(name = "aadhar")
-    private String aadhar;
-    // Landowner Aadhar
+    @Column(name = "aadhaar")
+    private String aadhaar;
+
+    public String getAadhaar() {
+        return aadhaar;
+    }
+
+    public void setAadhaar(String aadhaar) {
+        this.aadhaar = aadhaar;
+    }
+
+    public String getAadhaarUploadPath() {
+        return aadhaarUploadPath;
+    }
+
+    public void setAadhaarUploadPath(String aadhaarUploadPath) {
+        this.aadhaarUploadPath = aadhaarUploadPath;
+    }
+
+    public String getLandDeedPath() {
+        return landDeedPath;
+    }
+
+    public void setLandDeedPath(String landDeedPath) {
+        this.landDeedPath = landDeedPath;
+    }
+
+    @Column(name = "aadhaar_upload_path")
+    private String aadhaarUploadPath;
+
+    @Column(name = "land_deed_path")
+    private String landDeedPath;
+
     @Column(name = "address")
     private String address;
 
@@ -58,19 +91,12 @@ public class LandOwner extends AbstractAuditingEntity {
         this.signature = signature;
     }
 
-    public String getAadhar() {
-        return aadhar;
-    }
 
-    public void setAadhar(String aadhar) {
-        this.aadhar = aadhar;
-    }
-
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -92,7 +118,8 @@ public class LandOwner extends AbstractAuditingEntity {
 
 
     @Column(name = "date")
-    private Date date;  // Date of landowner record
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate date;  // Date of landowner record
 
     @Column(name = "email")
     private String email;  // Email

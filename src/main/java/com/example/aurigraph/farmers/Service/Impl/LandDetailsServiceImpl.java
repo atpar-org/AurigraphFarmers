@@ -1,8 +1,10 @@
 package com.example.aurigraph.farmers.Service.Impl;
 
-import com.example.aurigraph.farmers.DTO.CompleteLandDetailsDTO;
+import com.example.aurigraph.farmers.DTO.CompleteLandDetailsInDTO;
+import com.example.aurigraph.farmers.DTO.CompleteLandDetailsOutDTO;
 import com.example.aurigraph.farmers.Domain.*;
 import com.example.aurigraph.farmers.Mapping.LandDetailsMapping;
+import com.example.aurigraph.farmers.Mapping.LandOwnerMapping;
 import com.example.aurigraph.farmers.Repository.LandDetailsRepository;
 import com.example.aurigraph.farmers.Repository.LandOwnerRepository;
 import com.example.aurigraph.farmers.Security.SecurityUtils;
@@ -10,11 +12,10 @@ import com.example.aurigraph.farmers.Service.LandDetailsLandOwnersService;
 import com.example.aurigraph.farmers.Service.LandDetailsService;
 import com.example.aurigraph.farmers.Service.PropertyDetailsService;
 import com.example.aurigraph.farmers.Service.WitnessService;
-import org.apache.catalina.security.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.web.context.support.SecurityWebApplicationContextUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,32 +32,34 @@ public class LandDetailsServiceImpl implements LandDetailsService {
     private final LandDetailsMapping landDetailsMapping;
     private final PropertyDetailsService propertyDetailsService;
     private final WitnessService witnessService;
+    private final LandOwnerMapping landOwnerMapping;
 
     public LandDetailsServiceImpl(LandDetailsRepository landDetailsRepository,
                                   LandOwnerRepository landOwnerRepository,
                                   LandDetailsLandOwnersService landDetailsLandOwnersService,
                                   LandDetailsMapping landDetailsMapping,
                                   PropertyDetailsService propertyDetailsService,
-                                  WitnessService witnessService) {
+                                  WitnessService witnessService, LandOwnerMapping landOwnerMapping) {
         this.landDetailsRepository = landDetailsRepository;
         this.landOwnerRepository = landOwnerRepository;
         this.landDetailsLandOwnersService = landDetailsLandOwnersService;
         this.landDetailsMapping = landDetailsMapping;
         this.propertyDetailsService = propertyDetailsService;
         this.witnessService = witnessService;
+        this.landOwnerMapping = landOwnerMapping;
     }
 
     @Override
-    public List<CompleteLandDetailsDTO> findAll() {
+    public List<CompleteLandDetailsOutDTO> findAll() {
         logger.info("Fetching all land details");
         List<LandDetails> landDetails = (List<LandDetails>) landDetailsRepository.findAll();
         logger.debug("Found {} land details", landDetails.size());
 
-        List<CompleteLandDetailsDTO> completeLandDetails = new ArrayList<>();
+        List<CompleteLandDetailsOutDTO> completeLandDetails = new ArrayList<>();
         for (LandDetails landDetail : landDetails) {
             logger.debug("Processing land detail with ID: {}", landDetail.getId());
 
-            CompleteLandDetailsDTO completeLandDetailsDTO = landDetailsMapping.domainToDTO(landDetail);
+            CompleteLandDetailsOutDTO completeLandDetailsDTO = landDetailsMapping.domainToDTO(landDetail);
             List<LandOwner> landOwners = new ArrayList<>();
 
             List<LandDetailsLandOwners> landDetailsLandOwners = landDetailsLandOwnersService.findByLandDetailsId(landDetail.getId());
@@ -82,7 +85,7 @@ public class LandDetailsServiceImpl implements LandDetailsService {
     }
 
     @Override
-    public CompleteLandDetailsDTO findById(Long id) {
+    public CompleteLandDetailsOutDTO findById(Long id) {
         logger.info("Fetching land details with ID: {}", id);
         LandDetails landDetail = landDetailsRepository.findById(id).orElse(null);
         if (landDetail == null) {
@@ -90,7 +93,7 @@ public class LandDetailsServiceImpl implements LandDetailsService {
             return null;
         }
 
-        CompleteLandDetailsDTO completeLandDetailsDTO = landDetailsMapping.domainToDTO(landDetail);
+        CompleteLandDetailsOutDTO completeLandDetailsDTO = landDetailsMapping.domainToDTO(landDetail);
         logger.debug("Mapping land detail with ID: {} to DTO", id);
 
         List<LandOwner> landOwners = new ArrayList<>();
@@ -112,23 +115,39 @@ public class LandDetailsServiceImpl implements LandDetailsService {
     }
 
     @Override
-    public CompleteLandDetailsDTO save(CompleteLandDetailsDTO completeLandDetailsDTO) {
+    public CompleteLandDetailsOutDTO save(CompleteLandDetailsInDTO completeLandDetailsInDTO) {
         logger.info("Saving new land details");
 
         // Save LandDetails
+        LandDetails landDetails = landDetailsMapping.dtoToDomain(completeLandDetailsInDTO);
         try {
+            MultipartFile bankDetailsUpload = completeLandDetailsInDTO.getBankDetailsUpload();
 
 
-        LandDetails landDetails = landDetailsMapping.dtoToDomain(completeLandDetailsDTO);
+            String bankUploadPath="";
+
+
         String currentUser = SecurityUtils.getCurrentUserLogin();
         landDetails.setCreatedBy(currentUser);
         landDetails.setLastModifiedBy(currentUser);
         LandDetails savedLandDetails = landDetailsRepository.save(landDetails);
+            try{
+                if(bankDetailsUpload!=null){
+                    bankUploadPath = FilesManager.saveFile(bankDetailsUpload,"LandDetails","LandDetails-"+savedLandDetails.getId(),"Details","BankDetailsUpload"+savedLandDetails.getId(),bankDetailsUpload.getContentType());
+                }
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+            if(!bankUploadPath.isEmpty()){
+                landDetails.setBankDetailsPath(bankUploadPath);
+            }
         logger.debug("Saved LandDetails with ID: {}", savedLandDetails.getId());
 
         // Save Land Owners
         List<LandOwner> savedLandOwners = new ArrayList<>();
-        List<LandOwner> landOwners = completeLandDetailsDTO.getLandOwners();
+
+        List<LandOwner> landOwners = landOwnerMapping.DtosToDomains(completeLandDetailsInDTO,savedLandDetails.getId());
         if (landOwners != null) {
             for (LandOwner landOwner : landOwners) {
                 landOwner.setCreatedBy(currentUser);
@@ -148,7 +167,7 @@ public class LandDetailsServiceImpl implements LandDetailsService {
 
         // Save Property Details
         List<PropertyDetails> savedPropertyDetails = new ArrayList<>();
-        List<PropertyDetails> propertyDetails = completeLandDetailsDTO.getPropertyDetails();
+        List<PropertyDetails> propertyDetails = completeLandDetailsInDTO.getPropertyDetails();
         if (propertyDetails != null) {
             for (PropertyDetails propertyDetail : propertyDetails) {
                 propertyDetail.setLandDetailsId(savedLandDetails.getId());
@@ -161,7 +180,7 @@ public class LandDetailsServiceImpl implements LandDetailsService {
 
         // Save Witnesses
         List<Witness> savedWitnesses = new ArrayList<>();
-        List<Witness> witnesses = completeLandDetailsDTO.getWitnesses();
+        List<Witness> witnesses = completeLandDetailsInDTO.getWitnesses();
         if (witnesses != null) {
             for (Witness witness : witnesses) {
                 witness.setLandDetailsId(savedLandDetails.getId());
@@ -175,7 +194,7 @@ public class LandDetailsServiceImpl implements LandDetailsService {
         logger.info("Successfully saved land details with ID: {}", savedLandDetails.getId());
 
         // Map back to DTO for response
-            CompleteLandDetailsDTO responseDTO = landDetailsMapping.domainToDTO(savedLandDetails);
+            CompleteLandDetailsOutDTO responseDTO = landDetailsMapping.domainToDTO(savedLandDetails);
             responseDTO.setLandOwners(savedLandOwners);
             responseDTO.setPropertyDetails(savedPropertyDetails);
             responseDTO.setWitnesses(savedWitnesses);
@@ -229,18 +248,18 @@ public class LandDetailsServiceImpl implements LandDetailsService {
 
 
     @Override
-    public List<CompleteLandDetailsDTO> findByUserId(Integer userId) {
+    public List<CompleteLandDetailsOutDTO> findByUserId(Integer userId) {
         logger.info("Fetching all land details");
 
 
         List<LandDetails> landDetails =  landDetailsRepository.findLandDetailsByUserId(userId);
         logger.debug("Found {} land details", landDetails.size());
 
-        List<CompleteLandDetailsDTO> completeLandDetails = new ArrayList<>();
+        List<CompleteLandDetailsOutDTO> completeLandDetails = new ArrayList<>();
         for (LandDetails landDetail : landDetails) {
             logger.debug("Processing land detail with ID: {}", landDetail.getId());
 
-            CompleteLandDetailsDTO completeLandDetailsDTO = landDetailsMapping.domainToDTO(landDetail);
+            CompleteLandDetailsOutDTO completeLandDetailsDTO = landDetailsMapping.domainToDTO(landDetail);
             List<LandOwner> landOwners = new ArrayList<>();
 
             List<LandDetailsLandOwners> landDetailsLandOwners = landDetailsLandOwnersService.findByLandDetailsId(landDetail.getId());

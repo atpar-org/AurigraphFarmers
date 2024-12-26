@@ -40,6 +40,17 @@ public class LandDetails extends AbstractAuditingEntity {
     @Column(name = "geo_coordinates" ,nullable = true)
     private String geoCoordinates; // Stores "latitude,longitude"
 
+    public String getBankDetailsPath() {
+        return BankDetailsPath;
+    }
+
+    public void setBankDetailsPath(String bankDetailsPath) {
+        BankDetailsPath = bankDetailsPath;
+    }
+
+    @Column(name = "bank_details_path")
+    private String BankDetailsPath;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false) // Foreign key to the User table
     private User user;
