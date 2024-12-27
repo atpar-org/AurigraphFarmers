@@ -140,8 +140,10 @@ public class LandDetailsServiceImpl implements LandDetailsService {
                 e.printStackTrace();
             }
             if(!bankUploadPath.isEmpty()){
-                landDetails.setBankDetailsPath(bankUploadPath);
+                savedLandDetails.setBankDetailsPath(bankUploadPath);
             }
+            savedLandDetails = landDetailsRepository.save(savedLandDetails);
+
         logger.debug("Saved LandDetails with ID: {}", savedLandDetails.getId());
 
         // Save Land Owners

@@ -38,6 +38,7 @@ public class LandDetailsMapping {
         completeLandDetailsOutDTO.setBranch(landDetails.getBranch());
         completeLandDetailsOutDTO.setAksmvbsMembershipNumber(landDetails.getAksmvbsMembershipNumber());
         completeLandDetailsOutDTO.setGeoCoordinates(landDetails.getGeoCoordinates());
+        completeLandDetailsOutDTO.setBankDetailsPath(landDetails.getBankDetailsPath());
         completeLandDetailsOutDTO.setUserId(landDetails.getUser().getId());
         completeLandDetailsOutDTO.setCreatedBy(landDetails.getCreatedBy());
         completeLandDetailsOutDTO.setCreatedDate(landDetails.getCreatedDate());
