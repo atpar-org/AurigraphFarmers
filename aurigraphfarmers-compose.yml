@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  mysqldb:
+    image: mysql:8.0.30
+    container_name: mysqldb
+    restart: always
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: aurigraph
+      MYSQL_DATABASE: AurigraphFarmers
+    volumes:
+      - mysqldata:/var/lib/mysql # Persistent storage for MySQL data
+
+  aurigraph-farmers-app:
+    image: shivain22/aurigraph-farmers-app:v3.3.5
+    container_name: aurigraph-farmers-app
+    restart: always
+    ports:
+      - "8005:8080" # Maps Spring Boot application port
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/AurigraphFarmers?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: aurigraph
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SECURITY_JWT_SECRET_KEY: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b
+      #SPRING_PROFILES_ACTIVE: docker # Optional if you're using profile-specific properties
+  frontend:
+    image: shivain22/farmer-auri:v2.2
+    restart: always
+    ports:
+       - "3005:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://192.168.0.102:8005
+volumes:
+  mysqldata:
