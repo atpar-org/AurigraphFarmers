@@ -6,6 +6,7 @@ import com.example.aurigraph.farmers.Domain.LandDetails;
 import com.example.aurigraph.farmers.Domain.User;
 import com.example.aurigraph.farmers.Repository.UserRepository;
 import com.example.aurigraph.farmers.Security.SecurityUtils;
+import com.example.aurigraph.farmers.Service.LandDetailsService;
 import org.springframework.stereotype.Component;
 
 
@@ -15,9 +16,11 @@ public class LandDetailsMapping {
 
 
     private final UserRepository userRepository;
+    private final LandDetailsService landDetailsService;
 
-    public LandDetailsMapping(UserRepository userRepository) {
+    public LandDetailsMapping(UserRepository userRepository, LandDetailsService landDetailsService) {
         this.userRepository = userRepository;
+        this.landDetailsService = landDetailsService;
     }
 
     public CompleteLandDetailsOutDTO domainToDTO(LandDetails landDetails) {
@@ -58,11 +61,19 @@ public class LandDetailsMapping {
 
         LandDetails landDetails = new LandDetails();
 
+
+
         String currentUser = SecurityUtils.getCurrentUserLogin();
 
         User user  = userRepository.findByEmail(currentUser).orElse(null);
         // Map simple fields
-        landDetails.setId(completeLandDetailsInDTO.getId());
+        if(completeLandDetailsInDTO.getId() != null) {
+            landDetails = landDetailsService.findLandDetailsById(completeLandDetailsInDTO.getId()).orElse(null);
+            if(landDetails == null) {
+                landDetails = new LandDetails();
+            }
+        }
+
         if(completeLandDetailsInDTO.getAccountNumber()!=null) {
             landDetails.setAccountNumber(completeLandDetailsInDTO.getAccountNumber());
         }
@@ -77,7 +88,8 @@ public class LandDetailsMapping {
        }
       if(completeLandDetailsInDTO.getSwiftCode()!=null) {
           landDetails.setSwiftCode(completeLandDetailsInDTO.getSwiftCode());
-      }if(completeLandDetailsInDTO.getBank()!=null) {
+      }
+      if(completeLandDetailsInDTO.getBank()!=null) {
           landDetails.setBank(completeLandDetailsInDTO.getBank());
         }
       if(completeLandDetailsInDTO.getBranch()!=null) {

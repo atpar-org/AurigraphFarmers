@@ -93,6 +93,11 @@ public class LandDetailsServiceImpl implements LandDetailsService {
     }
 
     @Override
+    public Optional<LandDetails> findLandDetailsById(Long id) {
+        return  landDetailsRepository.findById(id);
+    }
+
+    @Override
     public CompleteLandDetailsOutDTO findById(Long id) {
         logger.info("Fetching land details with ID: {}", id);
         LandDetails landDetail = landDetailsRepository.findById(id).orElse(null);

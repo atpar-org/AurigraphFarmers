@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface LandDetailsService {
     List<CompleteLandDetailsOutDTO> findAll();
 
+    Optional<LandDetails> findLandDetailsById(Long id);
+
     CompleteLandDetailsOutDTO findById(Long id);
 
     CompleteLandDetailsOutDTO save(CompleteLandDetailsInDTO completeLandDetailsInDTO);
