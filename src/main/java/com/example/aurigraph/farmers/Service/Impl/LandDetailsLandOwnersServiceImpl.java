@@ -51,4 +51,9 @@ public class LandDetailsLandOwnersServiceImpl implements LandDetailsLandOwnersSe
     public List<LandDetailsLandOwners> findByLandDetailsId(Long landDetailsId) {
         return repository.findByLandDetailsId(landDetailsId);
     }
+
+    @Override
+    public  Optional<LandDetailsLandOwners> findByLandDetailsIdAndLandOwnerId(Long landDetailsId, Long landOwnerId){
+        return repository.findByLandDetailsIdAndLandOwnerId(landDetailsId, landOwnerId);
+    }
 }

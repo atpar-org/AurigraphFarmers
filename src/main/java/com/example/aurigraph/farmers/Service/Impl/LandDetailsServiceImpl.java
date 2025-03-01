@@ -5,6 +5,8 @@ import com.example.aurigraph.farmers.DTO.CompleteLandDetailsOutDTO;
 import com.example.aurigraph.farmers.Domain.*;
 import com.example.aurigraph.farmers.Mapping.LandDetailsMapping;
 import com.example.aurigraph.farmers.Mapping.LandOwnerMapping;
+import com.example.aurigraph.farmers.Mapping.PropertyMapping;
+import com.example.aurigraph.farmers.Mapping.WitnessMapping;
 import com.example.aurigraph.farmers.Repository.LandDetailsRepository;
 import com.example.aurigraph.farmers.Repository.LandOwnerRepository;
 import com.example.aurigraph.farmers.Security.SecurityUtils;
@@ -34,12 +36,15 @@ public class LandDetailsServiceImpl implements LandDetailsService {
     private final WitnessService witnessService;
     private final LandOwnerMapping landOwnerMapping;
     private final FilesManager filesManager;
+    private final PropertyMapping propertyMapping;
+    private final WitnessMapping witnessMapping;
+
     public LandDetailsServiceImpl(LandDetailsRepository landDetailsRepository,
                                   LandOwnerRepository landOwnerRepository,
                                   LandDetailsLandOwnersService landDetailsLandOwnersService,
                                   LandDetailsMapping landDetailsMapping,
                                   PropertyDetailsService propertyDetailsService,
-                                  WitnessService witnessService, LandOwnerMapping landOwnerMapping, FilesManager filesManager) {
+                                  WitnessService witnessService, LandOwnerMapping landOwnerMapping, FilesManager filesManager, PropertyMapping propertyMapping, WitnessMapping witnessMapping) {
         this.landDetailsRepository = landDetailsRepository;
         this.landOwnerRepository = landOwnerRepository;
         this.landDetailsLandOwnersService = landDetailsLandOwnersService;
@@ -48,6 +53,8 @@ public class LandDetailsServiceImpl implements LandDetailsService {
         this.witnessService = witnessService;
         this.landOwnerMapping = landOwnerMapping;
         this.filesManager = filesManager;
+        this.propertyMapping = propertyMapping;
+        this.witnessMapping = witnessMapping;
     }
 
     @Override
@@ -150,50 +157,70 @@ public class LandDetailsServiceImpl implements LandDetailsService {
 
         // Save Land Owners
         List<LandOwner> savedLandOwners = new ArrayList<>();
+        if(completeLandDetailsInDTO.getLandOwners() != null){
+            List<LandOwner> landOwners = landOwnerMapping.DtosToDomains(completeLandDetailsInDTO,savedLandDetails.getId());
+            if (landOwners != null) {
+                for (LandOwner landOwner : landOwners) {
+                    if(landOwner.getId()==null){
+                        landOwner.setCreatedBy(currentUser);
+                    }
+                    landOwner.setLastModifiedBy(currentUser);
+                    LandOwner savedLandOwner = landOwnerRepository.save(landOwner);
+                    savedLandOwners.add(savedLandOwner);
+                    logger.debug("Saved LandOwner with ID: {}", savedLandOwner.getId());
 
-        List<LandOwner> landOwners = landOwnerMapping.DtosToDomains(completeLandDetailsInDTO,savedLandDetails.getId());
-        if (landOwners != null) {
-            for (LandOwner landOwner : landOwners) {
-                landOwner.setCreatedBy(currentUser);
-                landOwner.setLastModifiedBy(currentUser);
-                LandOwner savedLandOwner = landOwnerRepository.save(landOwner);
-                savedLandOwners.add(savedLandOwner);
-                logger.debug("Saved LandOwner with ID: {}", savedLandOwner.getId());
+                    LandDetailsLandOwners association =landDetailsLandOwnersService.findByLandDetailsIdAndLandOwnerId(savedLandDetails.getId(), savedLandOwner.getId()).orElse(null);
 
-                LandDetailsLandOwners association = new LandDetailsLandOwners();
-                association.setLandDetailsId(savedLandDetails.getId());
-                association.setLandOwnerId(savedLandOwner.getId());
-                association.setCreatedBy(currentUser);
-                association.setLastModifiedBy(currentUser);
-                landDetailsLandOwnersService.save(association);
+                    if(association==null){
+                        association = new LandDetailsLandOwners();
+                        association.setLandDetailsId(savedLandDetails.getId());
+                        association.setLandOwnerId(savedLandOwner.getId());
+                        association.setCreatedBy(currentUser);
+                    }
+                    association.setLastModifiedBy(currentUser);
+                    landDetailsLandOwnersService.save(association);
+                }
             }
         }
 
-        // Save Property Details
-        List<PropertyDetails> savedPropertyDetails = new ArrayList<>();
-        List<PropertyDetails> propertyDetails = completeLandDetailsInDTO.getPropertyDetails();
-        if (propertyDetails != null) {
-            for (PropertyDetails propertyDetail : propertyDetails) {
-                propertyDetail.setLandDetailsId(savedLandDetails.getId());
-                propertyDetail.setCreatedBy(currentUser);
-                propertyDetail.setLastModifiedBy(currentUser);
-                propertyDetail = propertyDetailsService.save(propertyDetail);
-                savedPropertyDetails.add(propertyDetail);
-            }
-        }
+            List<PropertyDetails> savedPropertyDetails = new ArrayList<>();
+            // Save Property Details
+      if(completeLandDetailsInDTO.getPropertyDetails() != null){
+          List<PropertyDetails> propertyDetails = propertyMapping.getPropertyDetails(completeLandDetailsInDTO.getPropertyDetails());
+          if (propertyDetails != null) {
+              for (PropertyDetails propertyDetail : propertyDetails) {
+                  if(propertyDetail.getId()==null){
+                      propertyDetail.setLandDetailsId(savedLandDetails.getId());
+                      propertyDetail.setCreatedBy(currentUser);
+                  }
+                  propertyDetail.setLastModifiedBy(currentUser);
+                  propertyDetail = propertyDetailsService.save(propertyDetail);
+                  savedPropertyDetails.add(propertyDetail);
+              }
+          }
+      }
 
-        // Save Witnesses
-        List<Witness> savedWitnesses = new ArrayList<>();
-        List<Witness> witnesses = completeLandDetailsInDTO.getWitnesses();
-        if (witnesses != null) {
-            for (Witness witness : witnesses) {
-                witness.setLandDetailsId(savedLandDetails.getId());
-                witness.setCreatedBy(currentUser);
-                witness.setLastModifiedBy(currentUser);
-                witness = witnessService.save(witness);
-                savedWitnesses.add(witness);
+
+
+            List<Witness> savedWitnesses = new ArrayList<>();
+            if(completeLandDetailsInDTO.getWitnesses() != null){
+
+                List<Witness> witnesses  = witnessMapping.getWitnesses(completeLandDetailsInDTO.getWitnesses());
+                if (witnesses != null) {
+                    for (Witness witness : witnesses) {
+                        if(witness.getId()==null){
+                            witness.setLandDetailsId(savedLandDetails.getId());
+                            witness.setCreatedBy(currentUser);
+                        }
+                        witness.setLastModifiedBy(currentUser);
+                        witness = witnessService.save(witness);
+                        savedWitnesses.add(witness);
+                    }
+                }
             }
-        }
+
+            // Save Witnesses
+
 
         logger.info("Successfully saved land details with ID: {}", savedLandDetails.getId());
 

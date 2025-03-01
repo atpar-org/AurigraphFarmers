@@ -63,18 +63,39 @@ public class LandDetailsMapping {
         User user  = userRepository.findByEmail(currentUser).orElse(null);
         // Map simple fields
         landDetails.setId(completeLandDetailsInDTO.getId());
-        landDetails.setAccountNumber(completeLandDetailsInDTO.getAccountNumber());
-        landDetails.setAccountHolder(completeLandDetailsInDTO.getAccountHolder());
+        if(completeLandDetailsInDTO.getAccountNumber()!=null) {
+            landDetails.setAccountNumber(completeLandDetailsInDTO.getAccountNumber());
+        }
+        if(completeLandDetailsInDTO.getAccountHolder()!=null) {
+            landDetails.setAccountHolder(completeLandDetailsInDTO.getAccountHolder());
+        }
+
 //        commented to get the date and time instant
 //        landDetails.setDateCreated(completeLandDetailsInDTO.getDateCreated());
-        landDetails.setIfscCode(completeLandDetailsInDTO.getIfscCode());
-        landDetails.setSwiftCode(completeLandDetailsInDTO.getSwiftCode());
-        landDetails.setBank(completeLandDetailsInDTO.getBank());
-        landDetails.setBranch(completeLandDetailsInDTO.getBranch());
-        landDetails.setAksmvbsMembershipNumber(completeLandDetailsInDTO.getAksmvbsMembershipNumber());
-        landDetails.setGeoCoordinates(completeLandDetailsInDTO.getGeoCoordinates());
-        landDetails.setApproved(completeLandDetailsInDTO.isApproved());
-        landDetails.setApproverName(completeLandDetailsInDTO.getApproverName());
+       if(completeLandDetailsInDTO.getIfscCode()!=null) {
+           landDetails.setIfscCode(completeLandDetailsInDTO.getIfscCode());
+       }
+      if(completeLandDetailsInDTO.getSwiftCode()!=null) {
+          landDetails.setSwiftCode(completeLandDetailsInDTO.getSwiftCode());
+      }if(completeLandDetailsInDTO.getBank()!=null) {
+          landDetails.setBank(completeLandDetailsInDTO.getBank());
+        }
+      if(completeLandDetailsInDTO.getBranch()!=null) {
+          landDetails.setBranch(completeLandDetailsInDTO.getBranch());
+      }
+      if(completeLandDetailsInDTO.getAksmvbsMembershipNumber()!=null) {
+          landDetails.setAksmvbsMembershipNumber(completeLandDetailsInDTO.getAksmvbsMembershipNumber());
+      }
+      if(completeLandDetailsInDTO.getGeoCoordinates()!=null) {
+          landDetails.setGeoCoordinates(completeLandDetailsInDTO.getGeoCoordinates());
+      }
+       if(completeLandDetailsInDTO.isApproved()!=landDetails.isApproved()) {
+           landDetails.setApproved(completeLandDetailsInDTO.isApproved());
+       }
+        if(completeLandDetailsInDTO.getApproverName()!=null) {
+            landDetails.setApproverName(completeLandDetailsInDTO.getApproverName());
+        }
+
         landDetails.setUser(user);
 
         // Add additional mappings if needed
