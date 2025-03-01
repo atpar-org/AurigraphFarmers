@@ -65,7 +65,8 @@ public class LandDetailsMapping {
         landDetails.setId(completeLandDetailsInDTO.getId());
         landDetails.setAccountNumber(completeLandDetailsInDTO.getAccountNumber());
         landDetails.setAccountHolder(completeLandDetailsInDTO.getAccountHolder());
-        landDetails.setDateCreated(completeLandDetailsInDTO.getDateCreated());
+//        commented to get the date and time instant
+//        landDetails.setDateCreated(completeLandDetailsInDTO.getDateCreated());
         landDetails.setIfscCode(completeLandDetailsInDTO.getIfscCode());
         landDetails.setSwiftCode(completeLandDetailsInDTO.getSwiftCode());
         landDetails.setBank(completeLandDetailsInDTO.getBank());

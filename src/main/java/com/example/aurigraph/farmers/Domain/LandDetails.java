@@ -5,6 +5,7 @@ import com.example.aurigraph.farmers.AbstractAuditingEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "land_details")
@@ -19,8 +20,17 @@ public class LandDetails extends AbstractAuditingEntity {
     @Column(name = "account_holder")
     private String accountHolder;  // Account Holder name
 
-    @Column(name = "date_created")
-    private LocalDate dateCreated;
+    @Column(name = "date_time_created", columnDefinition = "TIMESTAMP")
+    private LocalDateTime dateCreated;
+
+    public LocalDateTime getDateCreated() {
+        return dateCreated;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.dateCreated = LocalDateTime.now();
+    }
 
     @Column(name = "ifsc_code")
     private String ifscCode;  // IFSC Code
@@ -104,13 +114,13 @@ public class LandDetails extends AbstractAuditingEntity {
     }
 
 
-    public LocalDate getDateCreated() {
-        return dateCreated;
-    }
+//    public LocalDateTime getDateCreated() {
+//        return LocalDateTime.now();
+//    }
 
-    public void setDateCreated(LocalDate dateCreated) {
-        this.dateCreated = dateCreated;
-    }
+//    public void setDateCreated(LocalDate dateCreated) {
+//        this.dateCreated = dateCreated;
+//    }
 
 
 

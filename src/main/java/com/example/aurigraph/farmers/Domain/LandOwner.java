@@ -117,7 +117,7 @@ public class LandOwner extends AbstractAuditingEntity {
     }
 
 
-    @Column(name = "date")
+    @Column(name = "date", nullable = true)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;  // Date of landowner record
 

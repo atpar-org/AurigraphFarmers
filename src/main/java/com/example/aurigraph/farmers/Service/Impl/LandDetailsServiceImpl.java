@@ -33,13 +33,13 @@ public class LandDetailsServiceImpl implements LandDetailsService {
     private final PropertyDetailsService propertyDetailsService;
     private final WitnessService witnessService;
     private final LandOwnerMapping landOwnerMapping;
-
+    private final FilesManager filesManager;
     public LandDetailsServiceImpl(LandDetailsRepository landDetailsRepository,
                                   LandOwnerRepository landOwnerRepository,
                                   LandDetailsLandOwnersService landDetailsLandOwnersService,
                                   LandDetailsMapping landDetailsMapping,
                                   PropertyDetailsService propertyDetailsService,
-                                  WitnessService witnessService, LandOwnerMapping landOwnerMapping) {
+                                  WitnessService witnessService, LandOwnerMapping landOwnerMapping, FilesManager filesManager) {
         this.landDetailsRepository = landDetailsRepository;
         this.landOwnerRepository = landOwnerRepository;
         this.landDetailsLandOwnersService = landDetailsLandOwnersService;
@@ -47,6 +47,7 @@ public class LandDetailsServiceImpl implements LandDetailsService {
         this.propertyDetailsService = propertyDetailsService;
         this.witnessService = witnessService;
         this.landOwnerMapping = landOwnerMapping;
+        this.filesManager = filesManager;
     }
 
     @Override
@@ -118,6 +119,7 @@ public class LandDetailsServiceImpl implements LandDetailsService {
     public CompleteLandDetailsOutDTO save(CompleteLandDetailsInDTO completeLandDetailsInDTO) {
         logger.info("Saving new land details");
 
+
         // Save LandDetails
         LandDetails landDetails = landDetailsMapping.dtoToDomain(completeLandDetailsInDTO);
         try {
@@ -133,7 +135,7 @@ public class LandDetailsServiceImpl implements LandDetailsService {
         LandDetails savedLandDetails = landDetailsRepository.save(landDetails);
             try{
                 if(bankDetailsUpload!=null){
-                    bankUploadPath = FilesManager.saveFile(bankDetailsUpload,"LandDetails","LandDetails-"+savedLandDetails.getId(),"Details","BankDetailsUpload"+savedLandDetails.getId(),bankDetailsUpload.getContentType());
+                    bankUploadPath = filesManager.saveFile(bankDetailsUpload,"LandDetails","LandDetails-"+savedLandDetails.getId(),"Details","BankDetailsUpload"+savedLandDetails.getId(),bankDetailsUpload.getContentType());
                 }
             }
             catch(Exception e){
@@ -220,9 +222,9 @@ public class LandDetailsServiceImpl implements LandDetailsService {
                     if (updatedDetails.getAccountHolder() != null) {
                         existing.setAccountHolder(updatedDetails.getAccountHolder());
                     }
-                    if (updatedDetails.getDateCreated() != null) {
-                        existing.setDateCreated(updatedDetails.getDateCreated());
-                    }
+//                    if (updatedDetails.getDateCreated() != null) {
+//                        existing.setDateCreated(updatedDetails.getDateCreated());
+//                    }
                     if (updatedDetails.getIfscCode() != null) {
                         existing.setIfscCode(updatedDetails.getIfscCode());
                     }

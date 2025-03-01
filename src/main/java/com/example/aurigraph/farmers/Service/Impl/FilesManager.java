@@ -1,5 +1,7 @@
 package com.example.aurigraph.farmers.Service.Impl;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -10,8 +12,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+@Component
 public class FilesManager {
-    public static String saveFile(MultipartFile file,String imageFolder1, String imageFolder2,String entityName,  String doc, String fileType) throws IOException {
+    @Value("${app.file.target.dir}")
+    private  String targetDir;
+
+    public  String saveFile(MultipartFile file,String imageFolder1, String imageFolder2,String entityName,  String doc, String fileType) throws IOException {
+
+
         // Replace spaces with underscores in the entityName, imageType, and table
         entityName = entityName.replace(" ", "_");
         fileType = fileType.replace(" ", "_");
@@ -20,7 +28,7 @@ public class FilesManager {
         // Use the base directory with the correct separator
         String baseDir = System.getProperty("user.dir") + File.separator + "src" + File.separator +
                 "main" + File.separator + "resources" + File.separator + "static" +
-                File.separator + "images" + File.separator+ imageFolder1+ File.separator + imageFolder2+ File.separator + entityName + File.separator + doc ;
+                File.separator + "content" + File.separator+ imageFolder1+ File.separator + imageFolder2+ File.separator + entityName + File.separator + doc ;
 
         File dir = new File(baseDir);
 
@@ -39,8 +47,8 @@ public class FilesManager {
         }
 
         // Construct the relative path for saving the file
-        String path = "images" + "/" + imageFolder1 + "/" + imageFolder2+ "/"+ entityName + "/" + doc + "/" + fileName;
-        String targetFilePath = "images"+ File.separator+ imageFolder1 + File.separator + imageFolder2 + File.separator + entityName + File.separator + doc + File.separator + fileName;
+        String path = "content" + "/" + imageFolder1 + "/" + imageFolder2+ "/"+ entityName + "/" + doc + "/" + fileName;
+        String targetFilePath = "content"+ File.separator+ imageFolder1 + File.separator + imageFolder2 + File.separator + entityName + File.separator + doc + File.separator + fileName;
 
         // Use try-with-resources to ensure streams are closed properly
         try (InputStream inputStream = file.getInputStream();
@@ -54,13 +62,22 @@ public class FilesManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+//        System.out.println(targetDir);
 
         copyFileToTarget(serverFile, targetFilePath);
         return path;
     }
 
-    private static void copyFileToTarget(File file, String path) {
-        Path targetPath = Path.of("target" + File.separator + "classes" + File.separator + "static" + File.separator + path);
+    private void copyFileToTarget(File file, String path) {
+        Path targetPath = Path.of(path);
+
+        if (targetDir != null) {
+            if(!targetDir.isEmpty()){
+                targetPath = Path.of(targetDir + File.separator + path);
+            }
+        }
+        System.out.println(targetDir);
+        System.out.println(targetPath);
         try {
             Files.createDirectories(targetPath.getParent()); // Create target directories if they don't exist
             Files.copy(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);

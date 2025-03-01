@@ -75,7 +75,7 @@ public class Witness extends AbstractAuditingEntity {
     @Column(name = "note")
     private String note;
 
-    @Column(name = "date", nullable = false)
+    @Column(name = "date", nullable = true)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 }

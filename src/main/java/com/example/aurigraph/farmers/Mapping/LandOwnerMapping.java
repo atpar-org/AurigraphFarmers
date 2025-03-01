@@ -5,6 +5,7 @@ import com.example.aurigraph.farmers.DTO.CompleteLandDetailsInDTO;
 import com.example.aurigraph.farmers.DTO.LandOwnerDTO;
 import com.example.aurigraph.farmers.Domain.LandOwner;
 import com.example.aurigraph.farmers.Service.Impl.FilesManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,7 +14,13 @@ import java.util.List;
 
 @Component
 public class LandOwnerMapping {
+
+    @Autowired
+    private FilesManager filesManager;
+
     public List<LandOwner> DtosToDomains(CompleteLandDetailsInDTO completeLandDetailsInDTO,Long landDetailsId) {
+
+
         List<LandOwner> landOwners = new ArrayList<>();
         List<LandOwnerDTO> landOwnerDTOs = completeLandDetailsInDTO.getLandOwners();
         for (LandOwnerDTO landOwnerDTO : landOwnerDTOs) {
@@ -35,10 +42,10 @@ public class LandOwnerMapping {
             String landDeedUploadPath="";
             try{
                 if(aadhaarFile!=null){
-                    aadhaarUploadPath = FilesManager.saveFile(aadhaarFile,"LandDetails","LandDetails-"+landDetailsId,"LandOwner","Aadhaar-"+landOwner.getAadhaar(),aadhaarFile.getContentType());
+                    aadhaarUploadPath = filesManager.saveFile(aadhaarFile,"LandDetails","LandDetails-"+landDetailsId,"LandOwner","Aadhaar-"+landOwner.getAadhaar(),aadhaarFile.getContentType());
                 }
                 if(landDeedFile!=null){
-                    landDeedUploadPath = FilesManager.saveFile(aadhaarFile,"LandDetails","LandDetails-"+landDetailsId,"LandOwner","LandDeed-"+landOwner.getAadhaar(),landDeedFile.getContentType());
+                    landDeedUploadPath = filesManager.saveFile(aadhaarFile,"LandDetails","LandDetails-"+landDetailsId,"LandOwner","LandDeed-"+landOwner.getAadhaar(),landDeedFile.getContentType());
                 }
             }
             catch(Exception e){

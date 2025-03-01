@@ -14,7 +14,7 @@ import java.util.List;
 @Configuration
 public class OpenAPIConfig {
 
-    @Value("${aurigaphFarmers.openapi.dev-url}")
+    @Value("${aurigraph.farmers.openapi.dev-url}")
     private String defaultUrl;
 
     @Bean

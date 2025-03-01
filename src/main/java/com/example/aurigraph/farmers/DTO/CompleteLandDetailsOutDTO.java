@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class CompleteLandDetailsOutDTO {
@@ -38,11 +39,11 @@ public class CompleteLandDetailsOutDTO {
         this.accountHolder = accountHolder;
     }
 
-    public LocalDate getDateCreated() {
+    public LocalDateTime getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreated(LocalDate dateCreated) {
+    public void setDateCreated(LocalDateTime dateCreated) {
         this.dateCreated = dateCreated;
     }
 
@@ -118,7 +119,7 @@ public class CompleteLandDetailsOutDTO {
     private String accountHolder;  // Account Holder name
 
 
-    private LocalDate dateCreated;
+    private LocalDateTime dateCreated;
 
 
     private String ifscCode;  // IFSC Code
