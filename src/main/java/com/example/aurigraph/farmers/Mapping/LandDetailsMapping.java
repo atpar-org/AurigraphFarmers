@@ -4,6 +4,7 @@ import com.example.aurigraph.farmers.DTO.CompleteLandDetailsInDTO;
 import com.example.aurigraph.farmers.DTO.CompleteLandDetailsOutDTO;
 import com.example.aurigraph.farmers.Domain.LandDetails;
 import com.example.aurigraph.farmers.Domain.User;
+import com.example.aurigraph.farmers.Repository.LandDetailsRepository;
 import com.example.aurigraph.farmers.Repository.UserRepository;
 import com.example.aurigraph.farmers.Security.SecurityUtils;
 import com.example.aurigraph.farmers.Service.LandDetailsService;
@@ -16,11 +17,12 @@ public class LandDetailsMapping {
 
 
     private final UserRepository userRepository;
-    private final LandDetailsService landDetailsService;
+    private final LandDetailsRepository landDetailsRepository;
 
-    public LandDetailsMapping(UserRepository userRepository, LandDetailsService landDetailsService) {
+    public LandDetailsMapping(UserRepository userRepository, LandDetailsRepository landDetailsRepository) {
         this.userRepository = userRepository;
-        this.landDetailsService = landDetailsService;
+        this.landDetailsRepository = landDetailsRepository;
+
     }
 
     public CompleteLandDetailsOutDTO domainToDTO(LandDetails landDetails) {
@@ -68,7 +70,7 @@ public class LandDetailsMapping {
         User user  = userRepository.findByEmail(currentUser).orElse(null);
         // Map simple fields
         if(completeLandDetailsInDTO.getId() != null) {
-            landDetails = landDetailsService.findLandDetailsById(completeLandDetailsInDTO.getId()).orElse(null);
+            landDetails = landDetailsRepository.findById(completeLandDetailsInDTO.getId()).orElse(null);
             if(landDetails == null) {
                 landDetails = new LandDetails();
             }
