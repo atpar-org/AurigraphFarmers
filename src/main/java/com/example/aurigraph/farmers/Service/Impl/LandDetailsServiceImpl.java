@@ -7,6 +7,7 @@ import com.example.aurigraph.farmers.Mapping.LandDetailsMapping;
 import com.example.aurigraph.farmers.Mapping.LandOwnerMapping;
 import com.example.aurigraph.farmers.Mapping.PropertyMapping;
 import com.example.aurigraph.farmers.Mapping.WitnessMapping;
+import com.example.aurigraph.farmers.Repository.LandDetailsLandOwnersRepository;
 import com.example.aurigraph.farmers.Repository.LandDetailsRepository;
 import com.example.aurigraph.farmers.Repository.LandOwnerRepository;
 import com.example.aurigraph.farmers.Security.SecurityUtils;
@@ -39,12 +40,13 @@ public class LandDetailsServiceImpl implements LandDetailsService {
     private final PropertyMapping propertyMapping;
     private final WitnessMapping witnessMapping;
 
+
     public LandDetailsServiceImpl(LandDetailsRepository landDetailsRepository,
                                   LandOwnerRepository landOwnerRepository,
                                   LandDetailsLandOwnersService landDetailsLandOwnersService,
                                   LandDetailsMapping landDetailsMapping,
                                   PropertyDetailsService propertyDetailsService,
-                                  WitnessService witnessService, LandOwnerMapping landOwnerMapping, FilesManager filesManager, PropertyMapping propertyMapping, WitnessMapping witnessMapping) {
+                                  WitnessService witnessService, LandOwnerMapping landOwnerMapping, FilesManager filesManager, PropertyMapping propertyMapping, WitnessMapping witnessMapping, LandDetailsLandOwnersRepository landDetailsLandOwnersRepository) {
         this.landDetailsRepository = landDetailsRepository;
         this.landOwnerRepository = landOwnerRepository;
         this.landDetailsLandOwnersService = landDetailsLandOwnersService;
@@ -322,6 +324,79 @@ public class LandDetailsServiceImpl implements LandDetailsService {
         }
         return completeLandDetails;
     }
+
+    @Override
+    public boolean deleteCompleteLandDetails(Long id) {
+
+        boolean deleted;
+
+        List<Witness> witnesses = witnessService.findByLandDetailsId(id);
+
+        for (Witness witness : witnesses) {
+            deleted = witnessService.delete(witness.getId());
+            if(!deleted){
+               return false;
+            }
+            logger.info("Deleted witness with ID: {}", witness.getId());
+        }
+
+        List<PropertyDetails> propertyDetails =propertyDetailsService.findByLandDetailsId(id);
+        for (PropertyDetails propertyDetail : propertyDetails) {
+            deleted = propertyDetailsService.delete(propertyDetail.getId());
+            if(!deleted){
+                logger.info("Failed to delete property : {}", propertyDetail.getId());
+                return false;
+            }
+            logger.info("Deleted property with ID: {}", propertyDetail.getId());
+        }
+        List<LandDetailsLandOwners> landDetailsLandOwners = landDetailsLandOwnersService.findByLandDetailsId(id);
+        for(LandDetailsLandOwners landDetailsLandOwner : landDetailsLandOwners){
+
+
+            deleted = landDetailsLandOwnersService.delete(landDetailsLandOwner.getId());
+            if(!deleted){
+                logger.info("Failed to delete land details Land Owners: {}", landDetailsLandOwner.getId());
+                return false;
+            }
+
+
+            LandOwner landOwner =landOwnerRepository.findById(landDetailsLandOwner.getLandOwnerId()).orElse(null);
+            if(landOwner == null){
+                logger.info("Failed to delete land details : {}", landDetailsLandOwner.getId());
+                return false;
+            }else {
+                try {
+                    landOwnerRepository.delete(landOwner);
+                    logger.info("Deleted landowner with ID: {}", landOwner.getId());
+                } catch (Exception e) {
+                    logger.info("Failed to delete Land Owner: "+landOwner.getId()+" "+ e);
+                    return false;
+
+                }
+
+            }
+        }
+
+
+        LandDetails landDetails = landDetailsRepository.findById(id).orElse(null);
+        if(landDetails==null){
+            logger.info("Unable to find land details : {}", id);
+            return false;
+        }
+
+        deleted = delete(id);
+
+        if(!deleted) {
+            logger.info("Failed to delete Land Details: " + id);
+            return false;
+
+        }
+
+        logger.info("Deleted land details with ID: {}", id);
+        return true;
+
+    }
+
     @Override
     public boolean delete(Long id) {
         logger.info("Deleting land details with ID: {}", id);

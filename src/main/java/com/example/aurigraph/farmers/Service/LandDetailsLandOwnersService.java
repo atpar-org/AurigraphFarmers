@@ -10,9 +10,11 @@ public interface LandDetailsLandOwnersService {
 
     LandDetailsLandOwners save(LandDetailsLandOwners entity);
 
+    LandDetailsLandOwners findById(Long id);
+
     LandDetailsLandOwners update(Long id, LandDetailsLandOwners entity);
 
-    void delete(Long id);
+    boolean delete(Long id);
 
     Optional<LandDetailsLandOwners> getById(Long id);
 

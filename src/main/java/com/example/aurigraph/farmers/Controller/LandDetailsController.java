@@ -149,6 +149,24 @@ public class LandDetailsController {
         return responseVO;
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseVO<String> deleteLandDetails(@PathVariable Long id) {
+
+        logger.info("Request received to delete land details for ID: {}", id);
+        ResponseVO<String> responseVO = new ResponseVO<>();
+       boolean deleted =  landDetailsService.deleteCompleteLandDetails(id);
+       if(!deleted){
+           responseVO.setStatus(500);
+           responseVO.setMessage("An error occurred while deleting land details: " + id);
+           return responseVO;
+       }
+       responseVO.setStatus(200);
+       responseVO.setMessage("Land details deleted successfully.");
+       return responseVO;
+
+    }
+
+
     // Exception handler for invalid JSON format
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ResponseVO<Object>> handleInvalidJson(HttpMessageNotReadableException ex) {

@@ -1,4 +1,4 @@
-package com.example.aurigraph.farmers.DTO;
+package com.example.aurigraph.farmers.Response;
 
 public class LoginResponse {
     private String token;
@@ -21,5 +21,9 @@ public class LoginResponse {
         return token;
     }
 
-    // Getters and setters...
+    public LoginResponse(String token, long expiresIn) {
+        this.token = token;
+        this.expiresIn = expiresIn;
+    }
+
 }

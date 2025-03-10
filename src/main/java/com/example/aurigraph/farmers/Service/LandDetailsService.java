@@ -22,4 +22,6 @@ public interface LandDetailsService {
     boolean delete(Long id);
 
     List<CompleteLandDetailsOutDTO> findByUserId(Integer userId);
+
+    boolean deleteCompleteLandDetails(Long id);
 }

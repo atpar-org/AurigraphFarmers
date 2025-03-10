@@ -36,6 +36,8 @@ public class SecurityConfiguration {
                 .requestMatchers("/swagger-ui.html").permitAll()
                 .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/swagger/**").permitAll()
+                .requestMatchers("/api/sms/send-otp/**").permitAll()
+                .requestMatchers("/api/sms/verify-otp/**").permitAll()
                 .requestMatchers("/Aurigraph-Farmers-api-docs/**").permitAll()
                 .requestMatchers("/content/**").permitAll()
                 .anyRequest()

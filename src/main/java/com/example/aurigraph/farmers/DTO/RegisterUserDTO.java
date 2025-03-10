@@ -8,6 +8,26 @@ public class RegisterUserDTO {
 
     private String fullName;
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public String getOtp() {
+        return otp;
+    }
+
+    public void setOtp(String otp) {
+        this.otp = otp;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    private String phoneNumber;
+
+    private String otp;
+
     public String getEmail() {
         return email;
     }

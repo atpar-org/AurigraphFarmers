@@ -1,8 +1,12 @@
 package com.example.aurigraph.farmers.Service.Impl;
 
+import com.example.aurigraph.farmers.Domain.LandDetailsLandOwners;
 import com.example.aurigraph.farmers.Domain.LandOwner;
+import com.example.aurigraph.farmers.Repository.LandDetailsLandOwnersRepository;
 import com.example.aurigraph.farmers.Repository.LandOwnerRepository;
 import com.example.aurigraph.farmers.Service.LandOwnerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,9 +15,12 @@ import java.util.Optional;
 public class LandOwnerServiceImpl implements LandOwnerService {
 
     private final LandOwnerRepository landOwnerRepository;
+    private final LandDetailsLandOwnersRepository landDetailsLandOwnersRepository;
 
-    public LandOwnerServiceImpl(LandOwnerRepository landOwnerRepository) {
+    private static final Logger logger = LoggerFactory.getLogger(LandOwnerServiceImpl.class);
+    public LandOwnerServiceImpl(LandOwnerRepository landOwnerRepository, LandDetailsLandOwnersRepository landDetailsLandOwnersRepository) {
         this.landOwnerRepository = landOwnerRepository;
+        this.landDetailsLandOwnersRepository = landDetailsLandOwnersRepository;
     }
     @Override
     public List<LandOwner> findAll() {
@@ -48,5 +55,27 @@ public class LandOwnerServiceImpl implements LandOwnerService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean deleteLandOwner(Long id) {
+
+        List<LandDetailsLandOwners> landDetailsLandOwners = landDetailsLandOwnersRepository.findByLandOwnerId(id);
+        for(LandDetailsLandOwners landDetailsLandOwner : landDetailsLandOwners) {
+            try{
+                landDetailsLandOwnersRepository.deleteById(landDetailsLandOwner.getId());
+            }catch (Exception e){
+                logger.info("Failed to deleted landDetailsLandOwner: " + landDetailsLandOwner.getId());
+                return false;
+            }
+            try{
+                landOwnerRepository.deleteById(landDetailsLandOwner.getLandOwnerId());
+            }catch (Exception e){
+                logger.info("Failed to deleted landOwner: " + id);
+                return false;
+            }
+
+        }
+        return true;
     }
 }

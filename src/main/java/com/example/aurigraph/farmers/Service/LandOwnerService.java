@@ -15,4 +15,6 @@ public interface LandOwnerService {
     Optional<LandOwner> update(Long id, LandOwner updatedLandOwner);
 
     boolean delete(Long id);
+
+    boolean deleteLandOwner(Long id);
 }

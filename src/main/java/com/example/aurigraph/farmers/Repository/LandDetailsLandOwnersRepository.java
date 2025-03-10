@@ -13,6 +13,6 @@ public interface LandDetailsLandOwnersRepository extends CrudRepository<LandDeta
 
     List<LandDetailsLandOwners> findByLandDetailsId(Long landDetailsId);
     Optional<LandDetailsLandOwners> findByLandDetailsIdAndLandOwnerId(Long landDetailsId, Long landOwnerId);
+    List<LandDetailsLandOwners> findByLandOwnerId(Long landOwnerId);
 
-    // Additional query methods (if needed) can be defined here
 }

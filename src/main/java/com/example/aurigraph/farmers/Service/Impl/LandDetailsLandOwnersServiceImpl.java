@@ -4,6 +4,7 @@ import com.example.aurigraph.farmers.Domain.LandDetailsLandOwners;
 import com.example.aurigraph.farmers.Repository.LandDetailsLandOwnersRepository;
 import com.example.aurigraph.farmers.Service.LandDetailsLandOwnersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +22,11 @@ public class LandDetailsLandOwnersServiceImpl implements LandDetailsLandOwnersSe
     }
 
     @Override
+    public LandDetailsLandOwners findById(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    @Override
     public LandDetailsLandOwners update(Long id, LandDetailsLandOwners entity) {
         if (!repository.existsById(id)) {
             throw new IllegalArgumentException("Entity with id " + id + " not found");
@@ -30,11 +36,18 @@ public class LandDetailsLandOwnersServiceImpl implements LandDetailsLandOwnersSe
     }
 
     @Override
-    public void delete(Long id) {
+    public boolean delete(Long id) {
         if (!repository.existsById(id)) {
             throw new IllegalArgumentException("Entity with id " + id + " not found");
         }
-        repository.deleteById(id);
+        try {
+            repository.deleteById(id);
+            return true;
+        }
+        catch (EmptyResultDataAccessException e) {
+            return false;
+        }
+
     }
 
     @Override
