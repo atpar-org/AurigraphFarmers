@@ -67,7 +67,7 @@ public class LandDetailsMapping {
 
         String currentUser = SecurityUtils.getCurrentUserLogin();
 
-        User user  = userRepository.findByEmail(currentUser).orElse(null);
+        User user  = userRepository.findByPhoneNumber(currentUser).orElse(null);
         // Map simple fields
         if(completeLandDetailsInDTO.getId() != null) {
             landDetails = landDetailsRepository.findById(completeLandDetailsInDTO.getId()).orElse(null);

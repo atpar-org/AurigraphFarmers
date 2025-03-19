@@ -26,7 +26,6 @@ public class User extends AbstractAuditingEntity implements UserDetails {
     @Column(nullable = false)
     private String fullName;
 
-    @Column(unique = true, length = 100, nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -40,7 +39,7 @@ public class User extends AbstractAuditingEntity implements UserDetails {
         this.phoneNumber = phoneNumber;
     }
 
-    @Column(nullable = false)
+    @Column(unique = true, length = 15, nullable = false)
     private String phoneNumber;
 
 

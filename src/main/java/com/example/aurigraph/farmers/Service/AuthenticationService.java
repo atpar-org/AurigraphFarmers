@@ -40,12 +40,12 @@ public class AuthenticationService {
     public User authenticate(LoginUserDTO input) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        input.getEmail(),
+                        input.getPhoneNumber(),
                         input.getPassword()
                 )
         );
 
-        return userRepository.findByEmail(input.getEmail())
+        return userRepository.findByPhoneNumber(input.getPhoneNumber())
                 .orElseThrow();
     }
 }

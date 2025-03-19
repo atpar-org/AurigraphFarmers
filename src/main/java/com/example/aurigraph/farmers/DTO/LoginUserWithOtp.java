@@ -1,10 +1,8 @@
 package com.example.aurigraph.farmers.DTO;
 
-
-public class LoginUserDTO {
+public class LoginUserWithOtp {
     private String phoneNumber;
-
-    private String password;
+    private String otp;
 
     public String getPhoneNumber() {
         return phoneNumber;
@@ -13,14 +11,11 @@ public class LoginUserDTO {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
-
-    public String getPassword() {
-        return password;
+    public String getOtp() {
+        return otp;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setOtp(String otp) {
+        this.otp = otp;
     }
-
-    // getters and setters here...
 }

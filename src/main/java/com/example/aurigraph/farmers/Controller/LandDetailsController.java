@@ -66,7 +66,7 @@ public class LandDetailsController {
             List<CompleteLandDetailsOutDTO> landDetails = landDetailsService.findByUserId(userId);
             if (landDetails!= null) {
                 String currentUser = SecurityUtils.getCurrentUserLogin();
-                User user = userRepository.findByEmail(currentUser).orElse(null);
+                User user = userRepository.findByPhoneNumber(currentUser).orElse(null);
                 if (user != null && userId == user.getId()) {
                     resultList.addAll(landDetails);
                     responseVO.setStatus(200);
@@ -98,7 +98,7 @@ public class LandDetailsController {
             CompleteLandDetailsOutDTO completeLandDetailsDTO = landDetailsService.findById(id);
             if (completeLandDetailsDTO != null) {
                 String currentUser = SecurityUtils.getCurrentUserLogin();
-                User user = userRepository.findByEmail(currentUser).orElse(null);
+                User user = userRepository.findByPhoneNumber(currentUser).orElse(null);
                 if (user != null && Objects.equals(completeLandDetailsDTO.getUserId(), user.getId())) {
                     resultList.add(completeLandDetailsDTO);
                     responseVO.setStatus(200);
