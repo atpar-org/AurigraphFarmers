@@ -47,10 +47,10 @@ public class AuthenticationController {
         public ResponseEntity<?> register(@RequestBody RegisterUserDTO registerUserDto) {
             try {
                 // Check if OTP is valid
-                if (!otpService.validateOtp(registerUserDto.getPhoneNumber(), registerUserDto.getOtp())) {
+               /* if (!otpService.validateOtp(registerUserDto.getPhoneNumber(), registerUserDto.getOtp())) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                             .body(new ApiResponse(false, "Invalid or expired OTP"));
-                }
+                }*/
 
                 // Register the user
                 User registeredUser = authenticationService.signup(registerUserDto);

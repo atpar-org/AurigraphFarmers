@@ -7,6 +7,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -39,6 +41,10 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/sms/send-otp/**").permitAll()
                 .requestMatchers("/api/sms/verify-otp/**").permitAll()
                 .requestMatchers("/Aurigraph-Farmers-api-docs/**").permitAll()
+                .requestMatchers("/initiate-apisetu/**").permitAll()
+                .requestMatchers("/apisetuauth/**").permitAll()
+                .requestMatchers("/generateCodeVerifier/**").permitAll()
+                .requestMatchers("/generateCodeChallenge/**").permitAll()
                 .requestMatchers("/content/**").permitAll()
                 .anyRequest()
                 .authenticated()
@@ -65,5 +71,12 @@ public class SecurityConfiguration {
         source.registerCorsConfiguration("/**",configuration);
 
         return source;
+    }
+
+    @Bean
+    public HttpFirewall allowUrlEncodedSlashHttpFirewall() {
+        StrictHttpFirewall firewall = new StrictHttpFirewall();
+        firewall.setAllowUrlEncodedDoubleSlash(true); // Allow double slashes
+        return firewall;
     }
 }

@@ -133,30 +133,30 @@ public class LandDetailsServiceImpl implements LandDetailsService {
     public CompleteLandDetailsOutDTO save(CompleteLandDetailsInDTO completeLandDetailsInDTO) {
         logger.info("Saving new land details");
 
-
         // Save LandDetails
-        LandDetails landDetails = landDetailsMapping.dtoToDomain(completeLandDetailsInDTO);
         try {
-            MultipartFile bankDetailsUpload = completeLandDetailsInDTO.getBankDetailsUpload();
+            LandDetails landDetails = landDetailsMapping.dtoToDomain(completeLandDetailsInDTO);
+            String currentUser = SecurityUtils.getCurrentUserLogin();
+            landDetails.setCreatedBy(currentUser);
+            landDetails.setLastModifiedBy(currentUser);
+            LandDetails savedLandDetails = landDetailsRepository.save(landDetails);
+            if(completeLandDetailsInDTO.getBankDetailsUpload()!=null){
+                MultipartFile bankDetailsUpload = completeLandDetailsInDTO.getBankDetailsUpload();
 
 
-            String bankUploadPath="";
+                String bankUploadPath="";
 
-
-        String currentUser = SecurityUtils.getCurrentUserLogin();
-        landDetails.setCreatedBy(currentUser);
-        landDetails.setLastModifiedBy(currentUser);
-        LandDetails savedLandDetails = landDetailsRepository.save(landDetails);
-            try{
-                if(bankDetailsUpload!=null){
-                    bankUploadPath = filesManager.saveFile(bankDetailsUpload,"LandDetails","LandDetails-"+savedLandDetails.getId(),"Details","BankDetailsUpload"+savedLandDetails.getId(),bankDetailsUpload.getContentType());
+                try{
+                    if(bankDetailsUpload!=null){
+                        bankUploadPath = filesManager.saveFile(bankDetailsUpload,"LandDetails","LandDetails-"+savedLandDetails.getId(),"Details","BankDetailsUpload"+savedLandDetails.getId(),bankDetailsUpload.getContentType());
+                    }
                 }
-            }
-            catch(Exception e){
-                e.printStackTrace();
-            }
-            if(!bankUploadPath.isEmpty()){
-                savedLandDetails.setBankDetailsPath(bankUploadPath);
+                catch(Exception e){
+                    e.printStackTrace();
+                }
+                if(!bankUploadPath.isEmpty()){
+                    landDetails.setBankDetailsPath(bankUploadPath);
+                }
             }
             savedLandDetails = landDetailsRepository.save(savedLandDetails);
 
