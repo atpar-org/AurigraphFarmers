@@ -1,40 +1,162 @@
 package com.example.aurigraph.farmers.Controller;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.example.aurigraph.farmers.DTO.IssuedDocumentDTO;
 
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
+import com.example.aurigraph.farmers.Response.ResponseVO;
+import com.example.aurigraph.farmers.Service.ApiSetuService;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.web.bind.annotation.*;
+
+import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Map;
 
 
 @RestController
+@RequestMapping("/apisetu")
 public class ApiSetuController {
 
+    @Autowired
+    private ApiSetuService apiSetuService;
 
-    @GetMapping("/apisetuauth")
-    public ResponseEntity<String> handleRedirect(@RequestParam(required = false) String code,
-                                                 @RequestParam(required = false) String state,
-                                                 @RequestParam(required = false) String error,
-                                                 @RequestParam(required = false, name = "error_description") String errorDescription) {
-        if (error != null) {
-            System.out.println("Error: " + error);
-            System.out.println("Error Description: " + errorDescription);
-            return ResponseEntity.badRequest().body("Error occurred: " + errorDescription);
+    @GetMapping("/auth-and-getDocs")
+    public ResponseVO<IssuedDocumentDTO> getAuthAndDocs(@RequestParam String code,
+                                                         @RequestParam(required = false) String state,
+                                                         @RequestParam String mobile,
+                                                         @RequestParam String codeVerifier  ) {
+
+        ResponseVO<IssuedDocumentDTO> responseVO = new ResponseVO<>();
+        Map<String,Object> accessResponse = apiSetuService.getAccessToken(code, codeVerifier).block();
+        if(accessResponse!=null && !accessResponse.isEmpty() && !accessResponse.containsKey("error")){
+            String accessToken = (String) accessResponse.get("access_token");
+            String refreshToken = (String) accessResponse.get("refresh_token");
+            long expiresIn = ((Number) accessResponse.get("expires_in")).longValue();
+            apiSetuService.saveAccessToken(mobile, accessToken, refreshToken, expiresIn);
+
+           List<IssuedDocumentDTO> issuedDocuments = fetchIssuedDocs(accessToken);
+            responseVO.setStatus(200);
+            responseVO.setMessage("Success");
+            responseVO.setData(issuedDocuments);
+            return responseVO;
+//            return new ResponseEntity<>(new IssuedDocumentsDTO(), HttpStatus.OK);
         }
 
-        System.out.println("Authorization Code: " + code);
-        System.out.println("State: " + state);
+        else{
+            responseVO.setStatus(401);
+            responseVO.setMessage("Invalid credentials or code verifier");
+            return responseVO;
 
-        return ResponseEntity.ok("Received code: " + code + ", state: " + state);
+        }
+
+    }
+
+    @GetMapping("/get-issued-docs")
+    public ResponseVO<IssuedDocumentDTO> getIssuedDocs(@RequestParam String mobile) {
+        ResponseVO<IssuedDocumentDTO> responseVO = new ResponseVO<>();
+        String accessToken = apiSetuService.getAccessToken(mobile);
+
+        if (accessToken == null) {
+            String refreshToken = apiSetuService.getRefreshToken(mobile);
+
+            if (refreshToken == null) {
+                responseVO.setStatus(401);
+                responseVO.setMessage("Refresh token && access token are null");
+                return responseVO;
+
+            }
+            Map<String, Object> refreshAccessResponse = refreshTokenAndRetry(mobile, refreshToken).block();
+            if (refreshAccessResponse == null) {
+                responseVO.setStatus(401);
+                responseVO.setMessage("Failed to get response using refresh token");
+                return responseVO;
+            }
+            accessToken = (String) refreshAccessResponse.get("access_token");
+        }
+
+        List<IssuedDocumentDTO> issuedDocuments =  fetchIssuedDocs(accessToken);
+        if (issuedDocuments == null) {
+            responseVO.setStatus(401);
+            responseVO.setMessage("Failed to fetch issued docs");
+            return responseVO;
+        }
+        responseVO.setStatus(200);
+        responseVO.setMessage("Success");
+        responseVO.setData(issuedDocuments);
+        return responseVO;
+    }
+
+    private List<IssuedDocumentDTO> fetchIssuedDocs(String accessToken) {
+        return   apiSetuService.getIssuedDocs(accessToken);
+
+    }
+
+    @PutMapping("/remove-tokens")
+    private ResponseVO clearAccessAndRefreshToken(@RequestParam String mobile) {
+        ResponseVO responseVO = new ResponseVO();
+
+        boolean clearTokens = apiSetuService.clearTokens(mobile);
+        if(clearTokens){
+            responseVO.setStatus(200);
+            responseVO.setMessage("Success");
+            return responseVO;
+        }
+        responseVO.setStatus(500);
+        responseVO.setMessage("Failed to clear access and refresh token");
+        return responseVO;
     }
 
 
-    @GetMapping("/initiate-apisetu")
-    public String initiateOAuth() {
-        return "initiate-apisetu";
+//    private Mono<ResponseEntity<IssuedDocumentsDTO>> handleAccessTokenError(String mobile) {
+//        String refreshToken = apiSetuService.getRefreshToken(mobile);
+//                if(refreshToken != null) {
+//                    refreshTokenAndRetry(mobile, refreshToken)
+//                            .flatMap(refreshAccessResponse -> {
+//                                if (refreshAccessResponse != null && refreshAccessResponse.containsKey("access_token")) {
+//                                    String accessToken = (String) refreshAccessResponse.get("access_token");
+//                                    return fetchIssuedDocs(accessToken);
+//                                } else {
+//                                    return Mono.just(ResponseEntity.status(401).body(null));
+//                                }
+//                            })
+//                            .defaultIfEmpty(ResponseEntity.status(401).body(null));
+//                }
+//                return Mono.just(ResponseEntity.status(401).body(null));
+//
+//    }
+
+
+    private Mono<Map<String, Object>> refreshTokenAndRetry(String mobile,String refreshToken) {
+
+
+        return apiSetuService.refreshAccessToken(refreshToken)
+                .map(response -> {
+                    String newAccessToken = (String) response.get("access_token");
+                    String newRefreshToken = (String) response.get("refresh_token");
+                    long expiresIn = ((Number) response.get("expires_in")).longValue();
+                    apiSetuService.saveAccessToken(mobile, newAccessToken, newRefreshToken, expiresIn);
+                    return response;
+                });
     }
+
+//    @GetMapping("/apisetuauth")
+//    public ResponseEntity<String> handleRedirect(@RequestParam(required = false) String code,
+//                                                 @RequestParam(required = false) String state,
+//                                                 @RequestParam(required = false) String error,
+//                                                 @RequestParam(required = false, name = "error_description") String errorDescription) {
+//        if (error != null) {
+//            System.out.println("Error: " + error);
+//            System.out.println("Error Description: " + errorDescription);
+//            return ResponseEntity.badRequest().body("Error occurred: " + errorDescription);
+//        }
+//
+//        System.out.println("Authorization Code: " + code);
+//        System.out.println("State: " + state);
+//
+//        return ResponseEntity.ok("Received code: " + code + ", state: " + state);
+//    }
+
 
 
 }

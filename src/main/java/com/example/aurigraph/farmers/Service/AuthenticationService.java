@@ -9,43 +9,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-@Service
-public class AuthenticationService {
-    private final UserRepository userRepository;
 
-    private final PasswordEncoder passwordEncoder;
+public interface AuthenticationService {
 
-    private final AuthenticationManager authenticationManager;
+    User signup(RegisterUserDTO input);
 
-    public AuthenticationService(
-            UserRepository userRepository,
-            AuthenticationManager authenticationManager,
-            PasswordEncoder passwordEncoder
-    ) {
-        this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    public User signup(RegisterUserDTO input) {
-        User user = new User();
-        user.setFullName(input.getFullName());
-        user.setEmail(input.getEmail());
-        user.setPhoneNumber(input.getPhoneNumber());
-        user.setPassword(passwordEncoder.encode(input.getPassword()));
-
-        return userRepository.save(user);
-    }
-
-    public User authenticate(LoginUserDTO input) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        input.getPhoneNumber(),
-                        input.getPassword()
-                )
-        );
-
-        return userRepository.findByPhoneNumber(input.getPhoneNumber())
-                .orElseThrow();
-    }
+    User authenticate(LoginUserDTO input);
 }

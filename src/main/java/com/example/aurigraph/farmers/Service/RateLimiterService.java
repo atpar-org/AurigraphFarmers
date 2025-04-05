@@ -9,17 +9,8 @@ import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-@Service
-public class RateLimiterService {
-    private final ConcurrentMap<String, Bucket> buckets = new ConcurrentHashMap<>();
 
-    public Bucket resolveBucket(String phoneNumber) {
-        return buckets.computeIfAbsent(phoneNumber, key -> createNewBucket());
-    }
+public interface RateLimiterService {
 
-    private Bucket createNewBucket() {
-        return Bucket4j.builder()
-                .addLimit(Bandwidth.classic(3, Refill.intervally(3, Duration.ofMinutes(5)))) // Max 3 OTPs per 5 mins
-                .build();
-    }
+    Bucket resolveBucket(String phoneNumber);
 }
