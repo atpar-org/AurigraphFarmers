@@ -1,8 +1,13 @@
 package com.example.aurigraph.farmers.DTO;
 
 import com.example.aurigraph.farmers.Domain.LandOwner;
-import com.example.aurigraph.farmers.Domain.PropertyDetails;
+import com.example.aurigraph.farmers.Domain.Location;
+//import com.example.aurigraph.farmers.Domain.PropertyDetails;
 import com.example.aurigraph.farmers.Domain.Witness;
+import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
@@ -93,13 +98,6 @@ public class CompleteLandDetailsInDTO {
         this.landOwners = landOwners;
     }
 
-    public List<PropertyDetails> getPropertyDetails() {
-        return propertyDetails;
-    }
-
-    public void setPropertyDetails(List<PropertyDetails> propertyDetails) {
-        this.propertyDetails = propertyDetails;
-    }
 
     public List<Witness> getWitnesses() {
         return witnesses;
@@ -143,7 +141,45 @@ public class CompleteLandDetailsInDTO {
 
     private List<LandOwnerDTO> landOwners;
 
-    private List<PropertyDetails> propertyDetails;
+    private String cropDetails;
+
+    private Double totalAreaHectares;
+
+    private String surveyNumber;
+
+    private Location location;
+
+    public String getCropDetails() {
+        return cropDetails;
+    }
+
+    public void setCropDetails(String cropDetails) {
+        this.cropDetails = cropDetails;
+    }
+
+    public Double getTotalAreaHectares() {
+        return totalAreaHectares;
+    }
+
+    public void setTotalAreaHectares(Double totalAreaHectares) {
+        this.totalAreaHectares = totalAreaHectares;
+    }
+
+    public String getSurveyNumber() {
+        return surveyNumber;
+    }
+
+    public void setSurveyNumber(String surveyNumber) {
+        this.surveyNumber = surveyNumber;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
 
     private List<Witness> witnesses;
 

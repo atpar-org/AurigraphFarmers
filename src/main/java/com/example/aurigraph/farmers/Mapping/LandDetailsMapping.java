@@ -51,6 +51,10 @@ public class LandDetailsMapping {
         completeLandDetailsOutDTO.setLastModifiedDate(landDetails.getLastModifiedDate());
         completeLandDetailsOutDTO.setApproved(landDetails.isApproved());
         completeLandDetailsOutDTO.setApproverName(landDetails.getApproverName());
+        completeLandDetailsOutDTO.setCropDetails(landDetails.getCropDetails());
+        completeLandDetailsOutDTO.setSurveyNumber(landDetails.getSurveyNumber());
+        completeLandDetailsOutDTO.setTotalAreaHectares(landDetails.getTotalAreaHectares());
+        completeLandDetailsOutDTO.setLocation(landDetails.getLocation());
         // Add additional mappings if needed
 
         return completeLandDetailsOutDTO;
@@ -108,6 +112,18 @@ public class LandDetailsMapping {
        }
         if(completeLandDetailsInDTO.getApproverName()!=null) {
             landDetails.setApproverName(completeLandDetailsInDTO.getApproverName());
+        }
+        if(completeLandDetailsInDTO.getCropDetails()!=null) {
+            landDetails.setCropDetails(completeLandDetailsInDTO.getCropDetails());
+        }
+        if(completeLandDetailsInDTO.getSurveyNumber()!=null) {
+            landDetails.setSurveyNumber(completeLandDetailsInDTO.getSurveyNumber());
+        }
+        if(completeLandDetailsInDTO.getTotalAreaHectares()!=null) {
+            landDetails.setTotalAreaHectares(completeLandDetailsInDTO.getTotalAreaHectares());
+        }
+        if(completeLandDetailsInDTO.getLocation()!=null) {
+            landDetails.setLocation(completeLandDetailsInDTO.getLocation());
         }
 
         landDetails.setUser(user);

@@ -11,7 +11,7 @@ services:
       MYSQL_ROOT_PASSWORD: aurigraph
       MYSQL_DATABASE: AurigraphFarmers
     volumes:
-      - mysqldata:/var/lib/mysql # Persistent storage for MySQL data
+      - mysqldata:/var/lib/mysql
 #
 #  aurigraph-farmers-app:
 #    image: shivain22/aurigraph-farmers-app:v3.3.5

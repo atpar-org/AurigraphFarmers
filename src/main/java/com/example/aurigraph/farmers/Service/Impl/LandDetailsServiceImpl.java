@@ -5,7 +5,7 @@ import com.example.aurigraph.farmers.DTO.CompleteLandDetailsOutDTO;
 import com.example.aurigraph.farmers.Domain.*;
 import com.example.aurigraph.farmers.Mapping.LandDetailsMapping;
 import com.example.aurigraph.farmers.Mapping.LandOwnerMapping;
-import com.example.aurigraph.farmers.Mapping.PropertyMapping;
+//import com.example.aurigraph.farmers.Mapping.PropertyMapping;
 import com.example.aurigraph.farmers.Mapping.WitnessMapping;
 import com.example.aurigraph.farmers.Repository.LandDetailsLandOwnersRepository;
 import com.example.aurigraph.farmers.Repository.LandDetailsRepository;
@@ -13,7 +13,7 @@ import com.example.aurigraph.farmers.Repository.LandOwnerRepository;
 import com.example.aurigraph.farmers.Security.SecurityUtils;
 import com.example.aurigraph.farmers.Service.LandDetailsLandOwnersService;
 import com.example.aurigraph.farmers.Service.LandDetailsService;
-import com.example.aurigraph.farmers.Service.PropertyDetailsService;
+//import com.example.aurigraph.farmers.Service.PropertyDetailsService;
 import com.example.aurigraph.farmers.Service.WitnessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +33,11 @@ public class LandDetailsServiceImpl implements LandDetailsService {
     private final LandOwnerRepository landOwnerRepository;
     private final LandDetailsLandOwnersService landDetailsLandOwnersService;
     private final LandDetailsMapping landDetailsMapping;
-    private final PropertyDetailsService propertyDetailsService;
+//    private final PropertyDetailsService propertyDetailsService;
     private final WitnessService witnessService;
     private final LandOwnerMapping landOwnerMapping;
     private final FilesManager filesManager;
-    private final PropertyMapping propertyMapping;
+//    private final PropertyMapping propertyMapping;
     private final WitnessMapping witnessMapping;
 
 
@@ -45,17 +45,15 @@ public class LandDetailsServiceImpl implements LandDetailsService {
                                   LandOwnerRepository landOwnerRepository,
                                   LandDetailsLandOwnersService landDetailsLandOwnersService,
                                   LandDetailsMapping landDetailsMapping,
-                                  PropertyDetailsService propertyDetailsService,
-                                  WitnessService witnessService, LandOwnerMapping landOwnerMapping, FilesManager filesManager, PropertyMapping propertyMapping, WitnessMapping witnessMapping, LandDetailsLandOwnersRepository landDetailsLandOwnersRepository) {
+                                  WitnessService witnessService, LandOwnerMapping landOwnerMapping, FilesManager filesManager, WitnessMapping witnessMapping) {
         this.landDetailsRepository = landDetailsRepository;
         this.landOwnerRepository = landOwnerRepository;
         this.landDetailsLandOwnersService = landDetailsLandOwnersService;
         this.landDetailsMapping = landDetailsMapping;
-        this.propertyDetailsService = propertyDetailsService;
+
         this.witnessService = witnessService;
         this.landOwnerMapping = landOwnerMapping;
         this.filesManager = filesManager;
-        this.propertyMapping = propertyMapping;
         this.witnessMapping = witnessMapping;
     }
 
@@ -80,11 +78,10 @@ public class LandDetailsServiceImpl implements LandDetailsService {
                 }
             }
 
-            List<PropertyDetails> propertyDetails = propertyDetailsService.findByLandDetailsId(landDetail.getId());
+
             List<Witness> witnesses = witnessService.findByLandDetailsId(landDetail.getId());
 
             completeLandDetailsDTO.setLandOwners(landOwners);
-            completeLandDetailsDTO.setPropertyDetails(propertyDetails);
             completeLandDetailsDTO.setWitnesses(witnesses);
 
             completeLandDetails.add(completeLandDetailsDTO);
@@ -119,11 +116,10 @@ public class LandDetailsServiceImpl implements LandDetailsService {
                 landOwners.add(landOwner);
             }
         }
-        List<PropertyDetails> propertyDetails = propertyDetailsService.findByLandDetailsId(landDetail.getId());
+
         List<Witness> witnesses = witnessService.findByLandDetailsId(landDetail.getId());
 
         completeLandDetailsDTO.setLandOwners(landOwners);
-        completeLandDetailsDTO.setPropertyDetails(propertyDetails);
         completeLandDetailsDTO.setWitnesses(witnesses);
         logger.info("Completed fetching land details for ID: {}", id);
         return completeLandDetailsDTO;
@@ -190,22 +186,6 @@ public class LandDetailsServiceImpl implements LandDetailsService {
             }
         }
 
-            List<PropertyDetails> savedPropertyDetails = new ArrayList<>();
-            // Save Property Details
-      if(completeLandDetailsInDTO.getPropertyDetails() != null){
-          List<PropertyDetails> propertyDetails = propertyMapping.getPropertyDetails(completeLandDetailsInDTO.getPropertyDetails());
-          if (propertyDetails != null) {
-              for (PropertyDetails propertyDetail : propertyDetails) {
-                  if(propertyDetail.getId()==null){
-                      propertyDetail.setLandDetailsId(savedLandDetails.getId());
-                      propertyDetail.setCreatedBy(currentUser);
-                  }
-                  propertyDetail.setLastModifiedBy(currentUser);
-                  propertyDetail = propertyDetailsService.save(propertyDetail);
-                  savedPropertyDetails.add(propertyDetail);
-              }
-          }
-      }
 
 
 
@@ -234,7 +214,6 @@ public class LandDetailsServiceImpl implements LandDetailsService {
         // Map back to DTO for response
             CompleteLandDetailsOutDTO responseDTO = landDetailsMapping.domainToDTO(savedLandDetails);
             responseDTO.setLandOwners(savedLandOwners);
-            responseDTO.setPropertyDetails(savedPropertyDetails);
             responseDTO.setWitnesses(savedWitnesses);
 
             return responseDTO;
@@ -308,11 +287,9 @@ public class LandDetailsServiceImpl implements LandDetailsService {
                 }
             }
 
-            List<PropertyDetails> propertyDetails = propertyDetailsService.findByLandDetailsId(landDetail.getId());
             List<Witness> witnesses = witnessService.findByLandDetailsId(landDetail.getId());
 
             completeLandDetailsDTO.setLandOwners(landOwners);
-            completeLandDetailsDTO.setPropertyDetails(propertyDetails);
             completeLandDetailsDTO.setWitnesses(witnesses);
 
             completeLandDetails.add(completeLandDetailsDTO);
@@ -340,15 +317,7 @@ public class LandDetailsServiceImpl implements LandDetailsService {
             logger.info("Deleted witness with ID: {}", witness.getId());
         }
 
-        List<PropertyDetails> propertyDetails =propertyDetailsService.findByLandDetailsId(id);
-        for (PropertyDetails propertyDetail : propertyDetails) {
-            deleted = propertyDetailsService.delete(propertyDetail.getId());
-            if(!deleted){
-                logger.info("Failed to delete property : {}", propertyDetail.getId());
-                return false;
-            }
-            logger.info("Deleted property with ID: {}", propertyDetail.getId());
-        }
+
         List<LandDetailsLandOwners> landDetailsLandOwners = landDetailsLandOwnersService.findByLandDetailsId(id);
         for(LandDetailsLandOwners landDetailsLandOwner : landDetailsLandOwners){
 

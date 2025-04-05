@@ -88,6 +88,20 @@ public class LandDetails extends AbstractAuditingEntity {
     private String approverName;
 
 
+    @Column(name = "crop_details")
+    private String cropDetails; // Crop details
+
+    @Column(name = "total_area_hectares")
+    private Double totalAreaHectares; // Total area of the land in hectares
+
+    @Column(name = "survey_number")
+    private String surveyNumber; // Survey numbers (comma-separated)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id", nullable = false)
+    private Location location;
+
+
     public User getUser() {
         return user;
     }
@@ -180,6 +194,35 @@ public class LandDetails extends AbstractAuditingEntity {
         this.aksmvbsMembershipNumber = aksmvbsMembershipNumber;
     }
 
+    public String getCropDetails() {
+        return cropDetails;
+    }
 
+    public void setCropDetails(String cropDetails) {
+        this.cropDetails = cropDetails;
+    }
 
+    public Double getTotalAreaHectares() {
+        return totalAreaHectares;
+    }
+
+    public void setTotalAreaHectares(Double totalAreaHectares) {
+        this.totalAreaHectares = totalAreaHectares;
+    }
+
+    public String getSurveyNumber() {
+        return surveyNumber;
+    }
+
+    public void setSurveyNumber(String surveyNumber) {
+        this.surveyNumber = surveyNumber;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
 }
