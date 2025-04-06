@@ -1,17 +1,14 @@
 package com.example.aurigraph.farmers.DTO;
 
-import com.example.aurigraph.farmers.Domain.LandOwner;
+
 import com.example.aurigraph.farmers.Domain.Location;
 //import com.example.aurigraph.farmers.Domain.PropertyDetails;
 import com.example.aurigraph.farmers.Domain.Witness;
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
+
 import java.util.List;
 
 public class CompleteLandDetailsInDTO {
@@ -42,13 +39,6 @@ public class CompleteLandDetailsInDTO {
         this.accountHolder = accountHolder;
     }
 
-    public LocalDate getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(LocalDate dateCreated) {
-        this.dateCreated = dateCreated;
-    }
 
     public String getIfscCode() {
         return ifscCode;
@@ -115,7 +105,6 @@ public class CompleteLandDetailsInDTO {
     private String accountHolder;  // Account Holder name
 
 
-    private LocalDate dateCreated;
 
 
     private String ifscCode;  // IFSC Code

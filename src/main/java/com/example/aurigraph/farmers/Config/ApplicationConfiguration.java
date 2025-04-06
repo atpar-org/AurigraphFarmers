@@ -2,6 +2,7 @@ package com.example.aurigraph.farmers.Config;
 
 
 import com.example.aurigraph.farmers.Repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,8 +17,10 @@ import java.util.Collections;
 
 @Configuration
 public class ApplicationConfiguration {
+
     private final UserRepository userRepository;
 
+    @Autowired
     public ApplicationConfiguration(UserRepository userRepository) {
         this.userRepository = userRepository;
     }

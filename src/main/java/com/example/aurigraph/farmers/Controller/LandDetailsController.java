@@ -10,6 +10,7 @@ import com.example.aurigraph.farmers.Service.LandDetailsService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ public class LandDetailsController {
     private final LandDetailsService landDetailsService;
     private final UserRepository userRepository;
 
+    @Autowired
     public LandDetailsController(LandDetailsService landDetailsService, UserRepository userRepository) {
         this.landDetailsService = landDetailsService;
         this.userRepository = userRepository;

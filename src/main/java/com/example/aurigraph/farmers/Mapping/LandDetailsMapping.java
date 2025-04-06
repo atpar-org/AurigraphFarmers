@@ -2,14 +2,19 @@ package com.example.aurigraph.farmers.Mapping;
 
 import com.example.aurigraph.farmers.DTO.CompleteLandDetailsInDTO;
 import com.example.aurigraph.farmers.DTO.CompleteLandDetailsOutDTO;
+import com.example.aurigraph.farmers.DTO.DynamicLocationResponseDTO;
 import com.example.aurigraph.farmers.Domain.LandDetails;
+import com.example.aurigraph.farmers.Domain.Location;
 import com.example.aurigraph.farmers.Domain.User;
 import com.example.aurigraph.farmers.Repository.LandDetailsRepository;
+import com.example.aurigraph.farmers.Repository.LocationRepository;
 import com.example.aurigraph.farmers.Repository.UserRepository;
 import com.example.aurigraph.farmers.Security.SecurityUtils;
 import com.example.aurigraph.farmers.Service.LandDetailsService;
+import com.example.aurigraph.farmers.Service.LocationService;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 
 
 @Component
@@ -18,11 +23,12 @@ public class LandDetailsMapping {
 
     private final UserRepository userRepository;
     private final LandDetailsRepository landDetailsRepository;
+    private final LocationService locationService;
 
-    public LandDetailsMapping(UserRepository userRepository, LandDetailsRepository landDetailsRepository) {
+    public LandDetailsMapping(UserRepository userRepository, LandDetailsRepository landDetailsRepository, LocationService locationService) {
         this.userRepository = userRepository;
         this.landDetailsRepository = landDetailsRepository;
-
+        this.locationService = locationService;
     }
 
     public CompleteLandDetailsOutDTO domainToDTO(LandDetails landDetails) {
@@ -54,7 +60,9 @@ public class LandDetailsMapping {
         completeLandDetailsOutDTO.setCropDetails(landDetails.getCropDetails());
         completeLandDetailsOutDTO.setSurveyNumber(landDetails.getSurveyNumber());
         completeLandDetailsOutDTO.setTotalAreaHectares(landDetails.getTotalAreaHectares());
-        completeLandDetailsOutDTO.setLocation(landDetails.getLocation());
+
+        DynamicLocationResponseDTO dynamicLocationResponseDTO =locationService.getDynamicLocationHierarchy(landDetails.getLocation().getCode());
+        completeLandDetailsOutDTO.setLocation(dynamicLocationResponseDTO);
         // Add additional mappings if needed
 
         return completeLandDetailsOutDTO;
@@ -122,7 +130,11 @@ public class LandDetailsMapping {
         if(completeLandDetailsInDTO.getTotalAreaHectares()!=null) {
             landDetails.setTotalAreaHectares(completeLandDetailsInDTO.getTotalAreaHectares());
         }
-        if(completeLandDetailsInDTO.getLocation()!=null) {
+        if(completeLandDetailsInDTO.getLocation()!=null && completeLandDetailsInDTO.getLocation().getId()!=null) {
+            Optional<Location> location = locationService.findById(completeLandDetailsInDTO.getLocation().getId());
+            if(location.isPresent()) {
+                landDetails.setLocation(location.get());
+            }
             landDetails.setLocation(completeLandDetailsInDTO.getLocation());
         }
 

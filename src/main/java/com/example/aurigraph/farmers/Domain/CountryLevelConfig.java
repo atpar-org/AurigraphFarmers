@@ -1,13 +1,8 @@
 package com.example.aurigraph.farmers.Domain;
 
 import jakarta.persistence.*;
-import lombok.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+
 @Entity
 @Table(name = "country_level_config",
         uniqueConstraints = @UniqueConstraint(columnNames = {"country_id", "level_order"}))
@@ -17,7 +12,7 @@ public class CountryLevelConfig {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "country_id", nullable = false)
     private Country country;
 
@@ -27,5 +22,37 @@ public class CountryLevelConfig {
     @Column(name = "level_name", nullable = false)
     private String levelName;
 
-    // Getters, setters, constructors
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+    }
+
+    public Integer getLevelOrder() {
+        return levelOrder;
+    }
+
+    public void setLevelOrder(Integer levelOrder) {
+        this.levelOrder = levelOrder;
+    }
+
+    public String getLevelName() {
+        return levelName;
+    }
+
+    public void setLevelName(String levelName) {
+        this.levelName = levelName;
+    }
+
+
 }

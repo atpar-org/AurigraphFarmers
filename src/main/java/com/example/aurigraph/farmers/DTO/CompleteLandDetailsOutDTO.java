@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -145,7 +145,7 @@ public class CompleteLandDetailsOutDTO {
 
     private String surveyNumber;
 
-    private Location location;
+    private DynamicLocationResponseDTO location;
 
 
     private List<Witness> witnesses;
@@ -254,11 +254,11 @@ public class CompleteLandDetailsOutDTO {
         this.surveyNumber = surveyNumber;
     }
 
-    public Location getLocation() {
+    public DynamicLocationResponseDTO getLocation() {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(DynamicLocationResponseDTO location) {
         this.location = location;
     }
 }

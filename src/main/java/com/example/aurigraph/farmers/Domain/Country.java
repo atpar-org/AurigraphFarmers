@@ -2,13 +2,9 @@ package com.example.aurigraph.farmers.Domain;
 
 import jakarta.persistence.*;
 import java.util.List;
-import lombok.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+
+
 @Entity
 @Table(name = "countries")
 public class Country {
@@ -32,11 +28,55 @@ public class Country {
     @Column(name = "default_language")
     private String defaultLanguage;
 
-    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CountryLevelConfig> levelConfigs;
 
-    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Location> locations;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getIsoCode() {
+        return isoCode;
+    }
+
+    public void setIsoCode(String isoCode) {
+        this.isoCode = isoCode;
+    }
+
+    public String getContinent() {
+        return continent;
+    }
+
+    public void setContinent(String continent) {
+        this.continent = continent;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getDefaultLanguage() {
+        return defaultLanguage;
+    }
+
+    public void setDefaultLanguage(String defaultLanguage) {
+        this.defaultLanguage = defaultLanguage;
+    }
+
 
     // Getters, setters, constructors
 }

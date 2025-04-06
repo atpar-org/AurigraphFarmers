@@ -4,11 +4,16 @@ package com.example.aurigraph.farmers.Domain;
 import com.example.aurigraph.farmers.AbstractAuditingEntity;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "land_details")
+@Table(
+        name = "land_details",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"location_id", "survey_number"})
+        }
+)
 public class LandDetails extends AbstractAuditingEntity {
 
     @Id
@@ -61,7 +66,7 @@ public class LandDetails extends AbstractAuditingEntity {
     @Column(name = "bank_details_path")
     private String BankDetailsPath;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false) // Foreign key to the User table
     private User user;
 
@@ -97,7 +102,7 @@ public class LandDetails extends AbstractAuditingEntity {
     @Column(name = "survey_number")
     private String surveyNumber; // Survey numbers (comma-separated)
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 
