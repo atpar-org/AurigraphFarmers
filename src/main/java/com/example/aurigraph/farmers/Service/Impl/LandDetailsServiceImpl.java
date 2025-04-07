@@ -2,6 +2,7 @@ package com.example.aurigraph.farmers.Service.Impl;
 
 import com.example.aurigraph.farmers.DTO.CompleteLandDetailsInDTO;
 import com.example.aurigraph.farmers.DTO.CompleteLandDetailsOutDTO;
+import com.example.aurigraph.farmers.DTO.LandOwnerWithDocs;
 import com.example.aurigraph.farmers.Domain.*;
 import com.example.aurigraph.farmers.Mapping.LandDetailsMapping;
 import com.example.aurigraph.farmers.Mapping.LandOwnerMapping;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -80,8 +82,8 @@ public class LandDetailsServiceImpl implements LandDetailsService {
 
 
             List<Witness> witnesses = witnessService.findByLandDetailsId(landDetail.getId());
-
-            completeLandDetailsDTO.setLandOwners(landOwners);
+            List<LandOwnerWithDocs> landOwnerWithDocs = landOwnerMapping.domainToOutDTO(landOwners);
+            completeLandDetailsDTO.setLandOwners(landOwnerWithDocs);
             completeLandDetailsDTO.setWitnesses(witnesses);
 
             completeLandDetails.add(completeLandDetailsDTO);
@@ -118,19 +120,19 @@ public class LandDetailsServiceImpl implements LandDetailsService {
         }
 
         List<Witness> witnesses = witnessService.findByLandDetailsId(landDetail.getId());
-
-        completeLandDetailsDTO.setLandOwners(landOwners);
+        List<LandOwnerWithDocs> landOwnerWithDocs = landOwnerMapping.domainToOutDTO(landOwners);
+        completeLandDetailsDTO.setLandOwners(landOwnerWithDocs);
         completeLandDetailsDTO.setWitnesses(witnesses);
         logger.info("Completed fetching land details for ID: {}", id);
         return completeLandDetailsDTO;
     }
 
     @Override
-    public CompleteLandDetailsOutDTO save(CompleteLandDetailsInDTO completeLandDetailsInDTO) {
+    public CompleteLandDetailsOutDTO save(CompleteLandDetailsInDTO completeLandDetailsInDTO) throws IOException {
         logger.info("Saving new land details");
 
         // Save LandDetails
-        try {
+//        try {
             LandDetails landDetails = landDetailsMapping.dtoToDomain(completeLandDetailsInDTO);
             String currentUser = SecurityUtils.getCurrentUserLogin();
             landDetails.setCreatedBy(currentUser);
@@ -144,7 +146,7 @@ public class LandDetailsServiceImpl implements LandDetailsService {
 
                 try{
                     if(bankDetailsUpload!=null){
-                        bankUploadPath = filesManager.saveFile(bankDetailsUpload,"LandDetails","LandDetails-"+savedLandDetails.getId(),"Details","BankDetailsUpload"+savedLandDetails.getId(),bankDetailsUpload.getContentType());
+                        bankUploadPath = filesManager.saveFile(bankDetailsUpload,"LandDetails","LandDetails-"+savedLandDetails.getId(),"Details", "BankDetails","BankDetails_"+savedLandDetails.getId() , bankDetailsUpload.getContentType());
                     }
                 }
                 catch(Exception e){
@@ -213,13 +215,14 @@ public class LandDetailsServiceImpl implements LandDetailsService {
 
         // Map back to DTO for response
             CompleteLandDetailsOutDTO responseDTO = landDetailsMapping.domainToDTO(savedLandDetails);
-            responseDTO.setLandOwners(savedLandOwners);
+            List<LandOwnerWithDocs> landOwnerWithDocs = landOwnerMapping.domainToOutDTO(savedLandOwners);
+            responseDTO.setLandOwners(landOwnerWithDocs);
             responseDTO.setWitnesses(savedWitnesses);
 
             return responseDTO;
-        }catch (Exception e){
-            return null;
-        }
+//        }catch (Exception e){
+//            throw new RuntimeException("Saving land details failed"+ e);
+//        }
 
     }
 
@@ -288,8 +291,8 @@ public class LandDetailsServiceImpl implements LandDetailsService {
             }
 
             List<Witness> witnesses = witnessService.findByLandDetailsId(landDetail.getId());
-
-            completeLandDetailsDTO.setLandOwners(landOwners);
+            List<LandOwnerWithDocs> landOwnerWithDocs = landOwnerMapping.domainToOutDTO(landOwners);
+            completeLandDetailsDTO.setLandOwners(landOwnerWithDocs);
             completeLandDetailsDTO.setWitnesses(witnesses);
 
             completeLandDetails.add(completeLandDetailsDTO);

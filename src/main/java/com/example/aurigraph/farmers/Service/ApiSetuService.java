@@ -1,7 +1,9 @@
 package com.example.aurigraph.farmers.Service;
 
+import com.example.aurigraph.farmers.DTO.AadhaarDetailsDTO;
 import com.example.aurigraph.farmers.DTO.IssuedDocumentDTO;
 
+import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -21,4 +23,7 @@ public interface ApiSetuService {
     Mono<Map<String, Object>>  refreshAccessToken(String refreshToken);
 
     List<IssuedDocumentDTO> getIssuedDocs(String accessToken);
+
+    AadhaarDetailsDTO getDigiLockerAadhaarDocsByUri(String uri, String docType, String mobile);
+    MultipartFile getDigiLockerDocsByUri(String uri, String docType, String mobile);
 }

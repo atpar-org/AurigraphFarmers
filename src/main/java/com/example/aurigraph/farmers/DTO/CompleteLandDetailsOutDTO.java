@@ -1,10 +1,9 @@
 package com.example.aurigraph.farmers.DTO;
 
 import com.example.aurigraph.farmers.Domain.LandOwner;
-import com.example.aurigraph.farmers.Domain.Location;
-//import com.example.aurigraph.farmers.Domain.PropertyDetails;
+
 import com.example.aurigraph.farmers.Domain.Witness;
-import org.springframework.web.multipart.MultipartFile;
+
 
 
 import java.sql.Timestamp;
@@ -88,11 +87,11 @@ public class CompleteLandDetailsOutDTO {
         this.aksmvbsMembershipNumber = aksmvbsMembershipNumber;
     }
 
-    public List<LandOwner> getLandOwners() {
+    public List<LandOwnerWithDocs> getLandOwners() {
         return landOwners;
     }
 
-    public void setLandOwners(List<LandOwner> landOwners) {
+    public void setLandOwners(List<LandOwnerWithDocs> landOwners) {
         this.landOwners = landOwners;
     }
 
@@ -137,7 +136,7 @@ public class CompleteLandDetailsOutDTO {
 
     private String aksmvbsMembershipNumber;// Membership Number
 
-    private List<LandOwner> landOwners;
+    private List<LandOwnerWithDocs> landOwners;
 
     private String cropDetails;
 

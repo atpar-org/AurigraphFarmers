@@ -9,11 +9,30 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 public class LandOwnerDTO {
 
-
         private Long id;
+
+        private LocalDate date;  // Date of landowner record
+
+
+        private String email;  // Email
+
+
+        private String mobile;  // Mobile Number
+
+
+        private String landownerName;  // Landowner Name
+
+        private String signature;  // Landowner Signature
+
+        private String aadhaar;
+
+        private String address;
+
+        private List<IssuedDocumentDTO> docsDetails;
 
         public Long getId() {
             return id;
@@ -23,12 +42,6 @@ public class LandOwnerDTO {
             this.id = id;
         }
 
-
-        private String landownerName;  // Landowner Name
-
-
-        private String signature;  // Landowner Signature
-
         public String getAddress() {
             return address;
         }
@@ -37,38 +50,16 @@ public class LandOwnerDTO {
             this.address = address;
         }
 
-        @Column(name = "aadhaar")
-        private String aadhaar;
 
         public String getAadhaar() {
             return aadhaar;
         }
 
-    public MultipartFile getAadhaarFile() {
-        return aadhaarFile;
-    }
 
-    public void setAadhaarFile(MultipartFile aadhaarFile) {
-        this.aadhaarFile = aadhaarFile;
-    }
+        public void setAadhaar(String aadhaar) {
+                this.aadhaar = aadhaar;
+            }
 
-    public MultipartFile getLandDeedFile() {
-        return landDeedFile;
-    }
-
-    public void setLandDeedFile(MultipartFile landDeedFile) {
-        this.landDeedFile = landDeedFile;
-    }
-
-    public void setAadhaar(String aadhaar) {
-            this.aadhaar = aadhaar;
-        }
-
-        private MultipartFile aadhaarFile;
-
-        private MultipartFile landDeedFile;
-
-        private String address;
 
         public String getLandownerName() {
             return landownerName;
@@ -111,15 +102,13 @@ public class LandOwnerDTO {
             this.mobile = mobile;
         }
 
+        public List<IssuedDocumentDTO> getDocsDetails() {
+            return docsDetails;
+        }
 
-        private LocalDate date;  // Date of landowner record
-
-
-        private String email;  // Email
-
-
-        private String mobile;  // Mobile Number
-
-    }
+        public void setDocsDetails(List<IssuedDocumentDTO> docsDetails) {
+            this.docsDetails = docsDetails;
+        }
+}
 
 

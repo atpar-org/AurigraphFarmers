@@ -1,19 +1,28 @@
 package com.example.aurigraph.farmers.Service.Impl;
 
+import com.example.aurigraph.farmers.DTO.AadhaarDetails;
+import com.example.aurigraph.farmers.DTO.AadhaarDetailsDTO;
 import com.example.aurigraph.farmers.DTO.IssuedDocumentDTO;
 
 import com.example.aurigraph.farmers.Service.ApiSetuService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+import org.w3c.dom.*;
 
+import javax.imageio.ImageIO;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -38,7 +47,17 @@ public class ApiSetuServiceImpl implements ApiSetuService {
     @Value("${digiLocker.docs.url.issued}")
     private String issuedDocsUrl;
 
+    @Value("${digiLocker.docs.url.e-aadhaar}")
+    private String getEAdharDocsUrl;
+
+    @Value("${digiLocker.docs.by.uri}")
+    private String getDocsByUri;
+
+
     private final StringRedisTemplate redisTemplate;
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
 
     public ApiSetuServiceImpl(WebClient.Builder webClientBuilder, StringRedisTemplate redisTemplate) {
         this.webClient = webClientBuilder.build();
@@ -156,7 +175,6 @@ public class ApiSetuServiceImpl implements ApiSetuService {
     }
 
 
-
     private List<IssuedDocumentDTO> mapToIssuedDocumentsDTO(Map<String, Object> response) {
 
         List<Map<String, Object>> items = (List<Map<String, Object>>) response.get("items");
@@ -184,6 +202,209 @@ public class ApiSetuServiceImpl implements ApiSetuService {
 
         return documentDTO;
     }
+
+    @Override
+    public AadhaarDetailsDTO getDigiLockerAadhaarDocsByUri(String uri, String docType, String mobile) {
+//        String accessToken = getAccessToken(mobile);
+        String accessToken = "7dbb6a7579970e9f190c3c8dd795b2c2fcda6b36";
+            return downloadAndSaveAadhaarAsPdf(accessToken);
+
+
+    }
+
+    @Override
+    public MultipartFile getDigiLockerDocsByUri(String uri, String docType, String mobile) {
+//        String accessToken = getAccessToken(mobile);
+        String accessToken = "7dbb6a7579970e9f190c3c8dd795b2c2fcda6b36";
+       return downloadDocumentAsMultipartFile(uri,accessToken);
+
+    }
+
+    public AadhaarDetailsDTO downloadAndSaveAadhaarAsPdf(String accessToken) {
+        String xml = getEAadhaarXml(accessToken);
+        AadhaarDetails aadhaarDetails = parseAadhaarXml(xml);
+        AadhaarDetailsDTO aadhaarDetailsDTO = new AadhaarDetailsDTO();
+        aadhaarDetailsDTO.setCo(aadhaarDetails.getCo());
+        aadhaarDetailsDTO.setName(aadhaarDetails.getName());
+        aadhaarDetailsDTO.setDist(aadhaarDetails.getDist());
+        aadhaarDetailsDTO.setDob(aadhaarDetails.getDob());
+        aadhaarDetailsDTO.setGender(aadhaarDetails.getGender());
+        aadhaarDetailsDTO.setLoc(aadhaarDetails.getLoc());
+        aadhaarDetailsDTO.setPc(aadhaarDetails.getPc());
+        aadhaarDetailsDTO.setPo(aadhaarDetails.getPo());
+        aadhaarDetailsDTO.setUid(aadhaarDetails.getUid());
+        aadhaarDetailsDTO.setState(aadhaarDetails.getState());
+        aadhaarDetailsDTO.setVtc(aadhaarDetails.getVtc());
+        aadhaarDetailsDTO.setYob(aadhaarDetails.getYob());
+
+        aadhaarDetailsDTO.setImage(PdfGenerator.saveAadhaarAsPdf(aadhaarDetails, "aadhaar_" + aadhaarDetails.name + ".pdf"));
+        return aadhaarDetailsDTO;
+    }
+
+    public String getEAadhaarXml(String accessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.setAccept(List.of(MediaType.APPLICATION_XML));
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                getEAdharDocsUrl,
+                HttpMethod.GET,
+                entity,
+                String.class
+        );
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return response.getBody();
+        } else {
+            throw new RuntimeException("Failed to fetch Doc XML: " + response.getStatusCode());
+        }
+    }
+
+
+    public MultipartFile downloadDocumentAsMultipartFile(String url, String accessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.setAccept(List.of(MediaType.ALL)); // Accept any content type
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<byte[]> response = restTemplate.exchange(
+                getDocsByUri+url,
+                HttpMethod.GET,
+                entity,
+                byte[].class
+        );
+
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            byte[] fileBytes = response.getBody();
+
+            String contentType = response.getHeaders().getContentType() != null
+                    ? response.getHeaders().getContentType().toString()
+                    : "application/octet-stream";
+
+            // Try to extract filename from header
+            String fileName = "document";
+            List<String> disposition = response.getHeaders().get("Content-Disposition");
+            if (disposition != null && !disposition.isEmpty()) {
+                String contentDisp = disposition.get(0);
+                if (contentDisp.contains("filename=")) {
+                    fileName = contentDisp.split("filename=")[1].replace("\"", "").trim();
+                }
+            } else {
+                // Fallback extension
+                if (contentType.contains("pdf")) {
+                    fileName += ".pdf";
+                } else if (contentType.contains("jpeg")) {
+                    fileName += ".jpeg";
+                } else if (contentType.contains("png")) {
+                    fileName += ".png";
+                }
+            }
+
+            return new MockMultipartFile(fileName, fileName, contentType, fileBytes);
+        } else {
+            throw new RuntimeException("Failed to download document: " + response.getStatusCode());
+        }
+    }
+
+    private  String parseName(String xmlContent) {
+        try {
+            Document doc = DocumentBuilderFactory.newInstance()
+                    .newDocumentBuilder()
+                    .parse(new ByteArrayInputStream(xmlContent.getBytes()));
+
+            doc.getDocumentElement().normalize();
+            NodeList nodeList = doc.getElementsByTagName("PrintLetterBarcodeData");
+
+            if (nodeList.getLength() > 0) {
+                Element element = (Element) nodeList.item(0);
+                return element.getAttribute("name");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public AadhaarDetails parseAadhaarXml(String xmlContent) {
+        AadhaarDetails details = new AadhaarDetails();
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new ByteArrayInputStream(xmlContent.getBytes(StandardCharsets.UTF_8)));
+
+            doc.getDocumentElement().normalize();
+
+            if (xmlContent.contains("<PrintLetterBarcodeData")) {
+                // ✅ Legacy Aadhaar XML format
+                NodeList dataNodes = doc.getElementsByTagName("PrintLetterBarcodeData");
+                if (dataNodes.getLength() > 0) {
+                    Element dataElement = (Element) dataNodes.item(0);
+                    details.name = dataElement.getAttribute("name");
+                    details.gender = dataElement.getAttribute("gender");
+                    details.dob = dataElement.getAttribute("dob");
+                    details.yob = dataElement.getAttribute("yob");
+                    details.uid = dataElement.getAttribute("uid");
+                    details.co = dataElement.getAttribute("co");
+                    details.loc = dataElement.getAttribute("loc");
+                    details.po = dataElement.getAttribute("po");
+                    details.vtc = dataElement.getAttribute("vtc");
+                    details.dist = dataElement.getAttribute("dist");
+                    details.state = dataElement.getAttribute("state");
+                    details.pc = dataElement.getAttribute("pc");
+                } else {
+                    System.out.println("⚠️ No <PrintLetterBarcodeData> element found in Aadhaar XML");
+                }
+            } else if (xmlContent.contains("<KycRes")) {
+                // ✅ e-KYC Aadhaar XML format
+                NodeList uidDataList = doc.getElementsByTagName("UidData");
+                if (uidDataList.getLength() > 0) {
+                    Element uidData = (Element) uidDataList.item(0);
+
+                    details.uid = uidData.getAttribute("uid");
+
+                    Element poi = (Element) uidData.getElementsByTagName("Poi").item(0);
+                    if (poi != null) {
+                        details.name = poi.getAttribute("name");
+                        details.dob = poi.getAttribute("dob");
+                        details.gender = poi.getAttribute("gender");
+                    }
+
+                    Element poa = (Element) uidData.getElementsByTagName("Poa").item(0);
+                    if (poa != null) {
+                        details.co = poa.getAttribute("co");
+                        details.loc = poa.getAttribute("loc");
+                        details.po = poa.getAttribute("po");
+                        details.vtc = poa.getAttribute("vtc");
+                        details.dist = poa.getAttribute("dist");
+                        details.state = poa.getAttribute("state");
+                        details.pc = poa.getAttribute("pc");
+                    }
+                } else {
+                    System.out.println("⚠️ No <UidData> found in e-KYC Aadhaar XML");
+                }
+            } else {
+                System.out.println("⚠️ Unknown Aadhaar XML format");
+            }
+
+            // ✅ Extract base64 photo (common for both formats)
+            NodeList photoNodes = doc.getElementsByTagName("Pht");
+            if (photoNodes.getLength() > 0) {
+                String base64Photo = photoNodes.item(0).getTextContent();
+                byte[] photoBytes = Base64.getDecoder().decode(base64Photo);
+                details.photo = ImageIO.read(new ByteArrayInputStream(photoBytes));
+            } else {
+                System.out.println("⚠️ No <Pht> tag (photo) found in Aadhaar XML");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return details;
+    }
+
+
+
 
 
 }

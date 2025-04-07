@@ -125,9 +125,20 @@ public class LandDetailsController {
 
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseVO<CompleteLandDetailsOutDTO> createLandDetails(@Valid @ModelAttribute BindingResult bindingResult, CompleteLandDetailsInDTO completeLandDetailsInDTO) {
+    public ResponseVO<CompleteLandDetailsOutDTO> createLandDetails(
+            @Valid @ModelAttribute CompleteLandDetailsInDTO completeLandDetailsInDTO,
+            BindingResult bindingResult) {
+
         logger.info("Request received to create land details");
+
         ResponseVO<CompleteLandDetailsOutDTO> responseVO = new ResponseVO<>();
+
+        if (bindingResult.hasErrors()) {
+            logger.error("Validation failed: {}", bindingResult);
+            responseVO.setMessage("Validation failed");
+            return responseVO;
+        }
+
         List<CompleteLandDetailsOutDTO> resultList = new ArrayList<>();
 
         try {

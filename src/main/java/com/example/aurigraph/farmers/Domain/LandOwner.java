@@ -50,28 +50,6 @@ public class LandOwner extends AbstractAuditingEntity {
         this.aadhaar = aadhaar;
     }
 
-    public String getAadhaarUploadPath() {
-        return aadhaarUploadPath;
-    }
-
-    public void setAadhaarUploadPath(String aadhaarUploadPath) {
-        this.aadhaarUploadPath = aadhaarUploadPath;
-    }
-
-    public String getLandDeedPath() {
-        return landDeedPath;
-    }
-
-    public void setLandDeedPath(String landDeedPath) {
-        this.landDeedPath = landDeedPath;
-    }
-
-    @Column(name = "aadhaar_upload_path")
-    private String aadhaarUploadPath;
-
-    @Column(name = "land_deed_path")
-    private String landDeedPath;
-
     @Column(name = "address")
     private String address;
 
