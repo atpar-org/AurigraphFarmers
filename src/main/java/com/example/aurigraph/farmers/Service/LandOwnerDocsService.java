@@ -17,4 +17,6 @@ public interface LandOwnerDocsService {
     List<LandOwnerDoc> findAll();
 
     List<LandOwnerDoc> findByLandOwnerId(Long landOwnerId);
+
+    void deleteByLandOwnerId(Long landOwnerId);
 }

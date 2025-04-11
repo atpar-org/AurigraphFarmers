@@ -31,10 +31,11 @@ public class ApiSetuController {
         Map<String,Object> accessResponse = apiSetuService.getAccessToken(code, codeVerifier).block();
         if(accessResponse!=null && !accessResponse.isEmpty() && !accessResponse.containsKey("error")){
             String accessToken = (String) accessResponse.get("access_token");
+            System.out.println("access_token:"+accessToken);
             String refreshToken = (String) accessResponse.get("refresh_token");
             long expiresIn = ((Number) accessResponse.get("expires_in")).longValue();
             apiSetuService.saveAccessToken(mobile, accessToken, refreshToken, expiresIn);
-
+//            apiSetuService.revoke(mobile);
            List<IssuedDocumentDTO> issuedDocuments = fetchIssuedDocs(accessToken);
             responseVO.setStatus(200);
             responseVO.setMessage("Success");
@@ -56,7 +57,7 @@ public class ApiSetuController {
     public ResponseVO<IssuedDocumentDTO> getIssuedDocs(@RequestParam String mobile) {
         ResponseVO<IssuedDocumentDTO> responseVO = new ResponseVO<>();
         String accessToken = apiSetuService.getAccessToken(mobile);
-
+        System.out.println("access_token:"+accessToken);
         if (accessToken == null) {
             String refreshToken = apiSetuService.getRefreshToken(mobile);
 

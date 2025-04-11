@@ -26,4 +26,6 @@ public interface ApiSetuService {
 
     AadhaarDetailsDTO getDigiLockerAadhaarDocsByUri(String uri, String docType, String mobile);
     MultipartFile getDigiLockerDocsByUri(String uri, String docType, String mobile);
+
+    void revoke(String mobile);
 }

@@ -12,6 +12,8 @@ public interface LandOwnerService {
 
     LandOwner save(LandOwner landOwner);
 
+    List<LandOwner> getLandOwnersByMobile(String mobile);
+
     Optional<LandOwner> update(Long id, LandOwner updatedLandOwner);
 
     boolean delete(Long id);

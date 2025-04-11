@@ -14,11 +14,12 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import javax.imageio.ImageIO;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class PdfGenerator {
+public class FileGenerator {
 
     public static MultipartFile saveAsPdf(String name, String xmlContent, String fileName) {
         try {
@@ -74,4 +75,23 @@ public class PdfGenerator {
         }
     }
 
+    public static MultipartFile saveAadhaarImage(AadhaarDetails aadhaarDetails, String fileName) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            // Save the BufferedImage as PNG
+            ImageIO.write(aadhaarDetails.photo, "png", outputStream);
+
+            byte[] imageBytes = outputStream.toByteArray();
+
+            return new MockMultipartFile(
+                    fileName,
+                    fileName + ".png",
+                    MediaType.IMAGE_PNG_VALUE,
+                    imageBytes
+            );
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create Aadhaar photo image", e);
+        }
+    }
 }

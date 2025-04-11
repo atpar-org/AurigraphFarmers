@@ -2,10 +2,12 @@ package com.example.aurigraph.farmers.Mapping;
 
 
 import com.example.aurigraph.farmers.DTO.*;
+import com.example.aurigraph.farmers.Domain.LandDetailsLandOwners;
 import com.example.aurigraph.farmers.Domain.LandOwner;
 import com.example.aurigraph.farmers.Domain.LandOwnerDoc;
 import com.example.aurigraph.farmers.Service.ApiSetuService;
 import com.example.aurigraph.farmers.Service.Impl.FilesManager;
+import com.example.aurigraph.farmers.Service.LandDetailsLandOwnersService;
 import com.example.aurigraph.farmers.Service.LandOwnerDocsService;
 import com.example.aurigraph.farmers.Service.LandOwnerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +15,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 
 @Component
 public class LandOwnerMapping {
@@ -29,6 +29,8 @@ public class LandOwnerMapping {
     private ApiSetuService apiSetuService;
     @Autowired
     private LandOwnerDocsService landOwnerDocsService;
+    @Autowired
+    private LandDetailsLandOwnersService landDetailsLandOwnersService;
 
     public List<LandOwner> DtosToDomains(CompleteLandDetailsInDTO completeLandDetailsInDTO,Long landDetailsId) throws IOException {
 
@@ -37,13 +39,24 @@ public class LandOwnerMapping {
         List<LandOwnerDTO> landOwnerDTOs = completeLandDetailsInDTO.getLandOwners();
 
         for (LandOwnerDTO landOwnerDTO : landOwnerDTOs) {
-            LandOwner landOwner = new LandOwner();
+            LandOwner landOwner =null;
             if(landOwnerDTO.getId()!=null){
 
                 landOwner = landOwnerService.findById(landOwnerDTO.getId()).orElse(null);
-                if(landOwner == null){
-                    landOwner = new LandOwner();
+
+            }
+            if(landOwner == null){
+                landOwner = new LandOwner();
+                List<LandOwner> existingLandOwners = landOwnerService.getLandOwnersByMobile(landOwnerDTO.getMobile());
+                if(!existingLandOwners.isEmpty()){
+                    for(LandOwner existingLandOwner : existingLandOwners){
+                        Optional<LandDetailsLandOwners> landDetailsLandOwners = landDetailsLandOwnersService.findByLandDetailsIdAndLandOwnerId(landDetailsId, existingLandOwner.getId());
+                        if (landDetailsLandOwners.isPresent()) {
+                            landOwner = existingLandOwner;
+                        }
+                    }
                 }
+
             }
             if(landOwnerDTO.getId() != null){
                 landOwner.setId(landOwnerDTO.getId());
@@ -83,11 +96,15 @@ public class LandOwnerMapping {
                         AadhaarDetailsDTO aadhaarDetailsDTO = apiSetuService.getDigiLockerAadhaarDocsByUri(docDetails.getUri(),docDetails.getDoctype(),landOwner.getMobile());
 
                         if(aadhaarDetailsDTO!=null){
+
                             String docFilePath = filesManager.saveFile(aadhaarDetailsDTO.getImage(), "LandDetails", "LandDetails-" + landDetailsId, "LandOwner","LandOwner-"+landOwner.getId(), docDetails.getDoctype()+"-" +"image", aadhaarDetailsDTO.getImage().getContentType());
 
                             docsPaths.add(docFilePath);
 
                             landOwnerDocsDTO.setDocPath(docFilePath);
+
+                            landOwner =aadhaarDetailsToLandOwner(landOwner,aadhaarDetailsDTO);
+                            landOwnerService.save(landOwner);
                         }
                     }else{
                         MultipartFile doc =apiSetuService.getDigiLockerDocsByUri(docDetails.getUri(),docDetails.getDoctype(),landOwner.getMobile());
@@ -185,4 +202,35 @@ public class LandOwnerMapping {
         }
         return landOwnersWithDocs;
     }
+
+    public LandOwner aadhaarDetailsToLandOwner(LandOwner owner ,AadhaarDetailsDTO dto) {
+
+        if (isNotBlank(dto.getName())) owner.setLandownerName(dto.getName());
+        if (isNotBlank(dto.getUid())) owner.setAadhaar(dto.getUid());
+
+        // Construct address from available Aadhaar fields
+        StringBuilder addressBuilder = new StringBuilder();
+        if (isNotBlank(dto.getCo())) addressBuilder.append(dto.getCo()).append(", ");
+        if (isNotBlank(dto.getLoc())) addressBuilder.append(dto.getLoc()).append(", ");
+        if (isNotBlank(dto.getPo())) addressBuilder.append(dto.getPo()).append(", ");
+        if (isNotBlank(dto.getVtc())) addressBuilder.append(dto.getVtc()).append(", ");
+        if (isNotBlank(dto.getDist())) addressBuilder.append(dto.getDist()).append(", ");
+        if (isNotBlank(dto.getState())) addressBuilder.append(dto.getState()).append(", ");
+        if (isNotBlank(dto.getPc())) addressBuilder.append("PIN: ").append(dto.getPc());
+
+        String fullAddress = addressBuilder.toString().replaceAll(", $", "");
+        if (!fullAddress.isEmpty()) {
+            owner.setAddress(fullAddress);
+        }
+
+        // Optional: set today's date as record creation date
+        owner.setDate(LocalDate.now());
+
+        return owner;
+    }
+
+    private boolean isNotBlank(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
 }

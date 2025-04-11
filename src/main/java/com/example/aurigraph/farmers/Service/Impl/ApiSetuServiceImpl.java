@@ -52,6 +52,8 @@ public class ApiSetuServiceImpl implements ApiSetuService {
 
     @Value("${digiLocker.docs.by.uri}")
     private String getDocsByUri;
+    @Value("${digilocker.revoke}")
+    private String digiLockerRevoke;
 
 
     private final StringRedisTemplate redisTemplate;
@@ -68,12 +70,14 @@ public class ApiSetuServiceImpl implements ApiSetuService {
 
     @Override
     public void saveAccessToken(String mobile, String accessToken, String refreshToken, long expiresIn) {
+        mobile=mobile.trim();
         if (accessToken != null && !accessToken.isEmpty()) {
-            redisTemplate.opsForValue().set("access_token:+" +mobile, accessToken, expiresIn, TimeUnit.SECONDS);
+
+            redisTemplate.opsForValue().set("access_token:" +mobile, accessToken, expiresIn, TimeUnit.SECONDS);
         }
 
         if(refreshToken != null) {
-            redisTemplate.opsForValue().set("refresh_token:+" +mobile, refreshToken, 7, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set("refresh_token:" +mobile, refreshToken, 7, TimeUnit.DAYS);
         }
 
     }
@@ -205,8 +209,8 @@ public class ApiSetuServiceImpl implements ApiSetuService {
 
     @Override
     public AadhaarDetailsDTO getDigiLockerAadhaarDocsByUri(String uri, String docType, String mobile) {
-//        String accessToken = getAccessToken(mobile);
-        String accessToken = "7dbb6a7579970e9f190c3c8dd795b2c2fcda6b36";
+        String accessToken = getAccessToken(mobile);
+//        String accessToken = "7dbb6a7579970e9f190c3c8dd795b2c2fcda6b36";
             return downloadAndSaveAadhaarAsPdf(accessToken);
 
 
@@ -214,10 +218,37 @@ public class ApiSetuServiceImpl implements ApiSetuService {
 
     @Override
     public MultipartFile getDigiLockerDocsByUri(String uri, String docType, String mobile) {
-//        String accessToken = getAccessToken(mobile);
-        String accessToken = "7dbb6a7579970e9f190c3c8dd795b2c2fcda6b36";
+        String accessToken = getAccessToken(mobile);
+//        String accessToken = "7dbb6a7579970e9f190c3c8dd795b2c2fcda6b36";
        return downloadDocumentAsMultipartFile(uri,accessToken);
 
+    }
+
+    @Override
+    public void revoke(String mobile) {
+        // Create WebClient instance inside the method
+        WebClient webClient = WebClient.builder()
+                .baseUrl(digiLockerRevoke)
+                .defaultHeader("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .build();
+
+        // Construct the request body
+        String body = "token=" + getAccessToken(mobile) +
+                "&client_id=" + digiLockerClientId +
+                "&client_secret=" + digiLockerClientSecret;
+
+        // Send the POST request
+        webClient.post()
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(String.class)
+                .doOnNext(response -> {
+                    System.out.println("Logged out successfully: " + response);
+                })
+                .doOnError(error -> {
+                    System.err.println("Error revoking token: " + error.getMessage());
+                })
+                .subscribe(); // Asynchronous execution
     }
 
     public AadhaarDetailsDTO downloadAndSaveAadhaarAsPdf(String accessToken) {
@@ -237,7 +268,7 @@ public class ApiSetuServiceImpl implements ApiSetuService {
         aadhaarDetailsDTO.setVtc(aadhaarDetails.getVtc());
         aadhaarDetailsDTO.setYob(aadhaarDetails.getYob());
 
-        aadhaarDetailsDTO.setImage(PdfGenerator.saveAadhaarAsPdf(aadhaarDetails, "aadhaar_" + aadhaarDetails.name + ".pdf"));
+        aadhaarDetailsDTO.setImage(FileGenerator.saveAadhaarImage(aadhaarDetails, "aadhaar_" + aadhaarDetails.name));
         return aadhaarDetailsDTO;
     }
 

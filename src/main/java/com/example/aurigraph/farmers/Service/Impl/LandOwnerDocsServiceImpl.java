@@ -115,4 +115,11 @@ public class LandOwnerDocsServiceImpl implements LandOwnerDocsService {
         return landOwnerDocsRepository.findByLandOwnerId(landOwnerId);
     }
 
+    @Override
+    public void deleteByLandOwnerId(Long landOwnerId) {
+        List<LandOwnerDoc> landOwnerDocs = landOwnerDocsRepository.findByLandOwnerId(landOwnerId);
+        landOwnerDocsRepository.deleteAll(landOwnerDocs);
+
+    }
+
 }

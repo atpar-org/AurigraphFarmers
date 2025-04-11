@@ -4,6 +4,7 @@ import com.example.aurigraph.farmers.Domain.LandDetailsLandOwners;
 import com.example.aurigraph.farmers.Domain.LandOwner;
 import com.example.aurigraph.farmers.Repository.LandDetailsLandOwnersRepository;
 import com.example.aurigraph.farmers.Repository.LandOwnerRepository;
+import com.example.aurigraph.farmers.Service.LandOwnerDocsService;
 import com.example.aurigraph.farmers.Service.LandOwnerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,11 +17,13 @@ public class LandOwnerServiceImpl implements LandOwnerService {
 
     private final LandOwnerRepository landOwnerRepository;
     private final LandDetailsLandOwnersRepository landDetailsLandOwnersRepository;
+    private final LandOwnerDocsService landOwnerDocsService;
 
     private static final Logger logger = LoggerFactory.getLogger(LandOwnerServiceImpl.class);
-    public LandOwnerServiceImpl(LandOwnerRepository landOwnerRepository, LandDetailsLandOwnersRepository landDetailsLandOwnersRepository) {
+    public LandOwnerServiceImpl(LandOwnerRepository landOwnerRepository, LandDetailsLandOwnersRepository landDetailsLandOwnersRepository, LandOwnerDocsService landOwnerDocsService) {
         this.landOwnerRepository = landOwnerRepository;
         this.landDetailsLandOwnersRepository = landDetailsLandOwnersRepository;
+        this.landOwnerDocsService = landOwnerDocsService;
     }
     @Override
     public List<LandOwner> findAll() {
@@ -34,6 +37,12 @@ public class LandOwnerServiceImpl implements LandOwnerService {
     public LandOwner save(LandOwner landOwner) {
         return landOwnerRepository.save(landOwner);
     }
+
+    @Override
+    public List<LandOwner> getLandOwnersByMobile(String mobile) {
+        return landOwnerRepository.findByMobile( mobile);
+    }
+
     @Override
     public Optional<LandOwner> update(Long id, LandOwner updatedLandOwner) {
         return landOwnerRepository.findById(id)
@@ -66,6 +75,12 @@ public class LandOwnerServiceImpl implements LandOwnerService {
                 landDetailsLandOwnersRepository.deleteById(landDetailsLandOwner.getId());
             }catch (Exception e){
                 logger.info("Failed to deleted landDetailsLandOwner: " + landDetailsLandOwner.getId());
+                return false;
+            }
+            try{
+                landOwnerDocsService.deleteByLandOwnerId(landDetailsLandOwner.getLandOwnerId());
+            }catch (Exception e){
+                logger.info("Failed to deleted LandOwnerDocs for LandOwner : " + landDetailsLandOwner.getLandOwnerId());
                 return false;
             }
             try{

@@ -45,7 +45,7 @@ public class LocationController {
     @PostMapping(path = "/upload-location-csv" ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadLocationCsv(@RequestParam("countryId") Long countryId , @RequestParam("hierarchyLevelId") Long hierarchyLevelId, @RequestParam("file") MultipartFile file,@RequestParam(value = "parentLocationLgdCode", required = false)  String parentLocationLgdCode ) throws IOException {
         try {
-            locationService.saveLocationFromCsv(countryId,hierarchyLevelId,file,parentLocationLgdCode);
+//            locationService.saveLocationFromCsv(countryId,hierarchyLevelId,file,parentLocationLgdCode);
             return ResponseEntity.ok("Locations uploaded successfully.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
@@ -55,7 +55,7 @@ public class LocationController {
     @PostMapping(path = "/upload-locations-by-hierarchy-csv",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadLocationsByHierarchyCsv(@RequestParam("countryId") Long countryId , @RequestParam("file") MultipartFile file,@RequestParam("locationLgdCode") String locationLgdCode, @RequestParam("startIndex") int startIndex, @RequestParam("endIndex") int endIndex) throws IOException {
 
-        locationService.saveHierarchicalLocations(countryId,file,locationLgdCode,startIndex,endIndex);
+//        locationService.saveHierarchicalLocations(countryId,file,locationLgdCode,startIndex,endIndex);
         return ResponseEntity.ok("Locations by Hierarchy imported successfully");
     }
 

@@ -19,8 +19,10 @@ public interface LocationRepository  extends CrudRepository<Location, Long> {
             "l.id, l.country.id, l.levelConfig.id, " +
             "l.parent.id, l.name, l.code, l.fullPath, l.isCapital) " +
             "FROM Location l " +
-            "WHERE l.parent.id = :parentId")
+            "WHERE (:parentId IS NULL AND l.parent IS NULL) " +
+            "   OR (:parentId IS NOT NULL AND l.parent.id = :parentId)")
     List<LocationDTO> findByParentIdAsDTO(@Param("parentId") Long parentId);
+
 
     Optional<Location> findByCode(String code);
 
