@@ -31,4 +31,9 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findByPhoneNumer(String phoneNumber) {
         return userRepository.findByPhoneNumber(phoneNumber);
     }
+
+    @Override
+    public Optional<User> findById(Long userId) {
+        return userRepository.findById(userId);
+    }
 }

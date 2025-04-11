@@ -1,7 +1,10 @@
 package com.example.aurigraph.farmers.Service.Impl;
 
+import com.example.aurigraph.farmers.DTO.LandOwnerDTO;
+import com.example.aurigraph.farmers.DTO.LandOwnerWithDocs;
 import com.example.aurigraph.farmers.Domain.LandDetailsLandOwners;
 import com.example.aurigraph.farmers.Domain.LandOwner;
+import com.example.aurigraph.farmers.Mapping.LandOwnerMapping;
 import com.example.aurigraph.farmers.Repository.LandDetailsLandOwnersRepository;
 import com.example.aurigraph.farmers.Repository.LandOwnerRepository;
 import com.example.aurigraph.farmers.Service.LandOwnerDocsService;
@@ -10,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 @Service
@@ -20,14 +24,17 @@ public class LandOwnerServiceImpl implements LandOwnerService {
     private final LandOwnerDocsService landOwnerDocsService;
 
     private static final Logger logger = LoggerFactory.getLogger(LandOwnerServiceImpl.class);
-    public LandOwnerServiceImpl(LandOwnerRepository landOwnerRepository, LandDetailsLandOwnersRepository landDetailsLandOwnersRepository, LandOwnerDocsService landOwnerDocsService) {
+    private final LandOwnerMapping landOwnerMapping;
+
+    public LandOwnerServiceImpl(LandOwnerRepository landOwnerRepository, LandDetailsLandOwnersRepository landDetailsLandOwnersRepository, LandOwnerDocsService landOwnerDocsService, LandOwnerMapping landOwnerMapping) {
         this.landOwnerRepository = landOwnerRepository;
         this.landDetailsLandOwnersRepository = landDetailsLandOwnersRepository;
         this.landOwnerDocsService = landOwnerDocsService;
+        this.landOwnerMapping = landOwnerMapping;
     }
     @Override
     public List<LandOwner> findAll() {
-        return (List<LandOwner>) landOwnerRepository.findAll();
+        return landOwnerRepository.findAll();
     }
     @Override
     public Optional<LandOwner> findById(Long id) {
@@ -36,11 +43,6 @@ public class LandOwnerServiceImpl implements LandOwnerService {
     @Override
     public LandOwner save(LandOwner landOwner) {
         return landOwnerRepository.save(landOwner);
-    }
-
-    @Override
-    public List<LandOwner> getLandOwnersByMobile(String mobile) {
-        return landOwnerRepository.findByMobile( mobile);
     }
 
     @Override
@@ -92,5 +94,17 @@ public class LandOwnerServiceImpl implements LandOwnerService {
 
         }
         return true;
+    }
+
+    @Override
+    public Optional<LandOwner> getLandOwnerByMobile(String mobile) {
+        return landOwnerRepository.findByMobile(mobile);
+    }
+
+    @Override
+    public LandOwnerWithDocs saveLandOwner(LandOwnerDTO landOwnerDTO) throws IOException {
+       LandOwner landOwner = landOwnerMapping.DtoToDomain(landOwnerDTO);
+        return landOwnerMapping.domainToOutDTO(landOwner);
+
     }
 }

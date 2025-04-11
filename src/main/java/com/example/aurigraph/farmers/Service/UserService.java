@@ -12,4 +12,6 @@ public interface UserService {
     List<User> allUsers();
 
     Optional<User> findByPhoneNumer(String phoneNumber);
+
+    Optional<User> findById(Long userId);
 }

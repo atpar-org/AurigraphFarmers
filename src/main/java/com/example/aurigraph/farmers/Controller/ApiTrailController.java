@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class APiTrailController {
+public class ApiTrailController {
     @GetMapping("/apisetuauth")
     public ResponseEntity<String> handleRedirect(@RequestParam(required = false) String code,
                                                  @RequestParam(required = false) String state,

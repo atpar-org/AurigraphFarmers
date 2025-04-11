@@ -10,19 +10,21 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LandDetailsService {
-    List<CompleteLandDetailsOutDTO> findAll();
-
-    Optional<LandDetails> findLandDetailsById(Long id);
-
-    CompleteLandDetailsOutDTO findById(Long id);
-
-    CompleteLandDetailsOutDTO save(CompleteLandDetailsInDTO completeLandDetailsInDTO) throws IOException;
-
+//    List<LandDetails> findAll();
+    Optional<LandDetails> findById(Long id);
+//    LandDetails save(LandDetails landDetails);
     Optional<LandDetails> update(Long id, LandDetails updatedDetails);
-
     boolean delete(Long id);
+//    List<LandDetails> findByUserId(Integer userId);
 
-    List<CompleteLandDetailsOutDTO> findByUserId(Integer userId);
+
+    List<CompleteLandDetailsOutDTO> findAllCompleteLandDetails(Long userId);
+
+    CompleteLandDetailsOutDTO findCompleteLandDetailsById(Long id);
+
+    CompleteLandDetailsOutDTO saveCompleteLandDetails(CompleteLandDetailsInDTO completeLandDetailsInDTO) throws IOException;
+
+    List<CompleteLandDetailsOutDTO> findCompleteLandDetailsByUserId(Long userId);
 
     boolean deleteCompleteLandDetails(Long id);
 }

@@ -13,6 +13,6 @@ import java.util.Optional;
 @Repository
 public interface LandOwnerRepository extends CrudRepository<LandOwner, Long> {
 
-
-    List<LandOwner> findByMobile(String mobile);
+    List<LandOwner> findAll();
+    Optional<LandOwner> findByMobile(String mobile);
 }

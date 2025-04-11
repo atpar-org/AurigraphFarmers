@@ -36,12 +36,12 @@ public class LandDetailsController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping
-    public ResponseVO<CompleteLandDetailsOutDTO> getAllLandDetails() {
+    @GetMapping("/{userId}")
+    public ResponseVO<CompleteLandDetailsOutDTO> getAllLandDetails(@PathVariable Long userId) {
         logger.info("Request received to fetch all land details");
         ResponseVO<CompleteLandDetailsOutDTO> responseVO = new ResponseVO<>();
         try {
-            List<CompleteLandDetailsOutDTO> landDetails = landDetailsService.findAll();
+            List<CompleteLandDetailsOutDTO> landDetails = landDetailsService.findAllCompleteLandDetails(userId);
             if (landDetails.isEmpty()) {
                 responseVO.setStatus(404);
                 responseVO.setMessage("No land details found.");
@@ -60,12 +60,12 @@ public class LandDetailsController {
     }
 
     @GetMapping("/by-user/{userId}")
-    public ResponseVO<CompleteLandDetailsOutDTO> getAllLandDetailsByUser(@PathVariable int userId) {
+    public ResponseVO<CompleteLandDetailsOutDTO> getAllLandDetailsByUser(@PathVariable Long userId) {
         logger.info("Request received to fetch land details for user ID: {}", userId);
         ResponseVO<CompleteLandDetailsOutDTO> responseVO = new ResponseVO<>();
         List<CompleteLandDetailsOutDTO> resultList = new ArrayList<>();
         try {
-            List<CompleteLandDetailsOutDTO> landDetails = landDetailsService.findByUserId(userId);
+            List<CompleteLandDetailsOutDTO> landDetails = landDetailsService.findCompleteLandDetailsByUserId(userId);
             if (landDetails!= null) {
                 String currentUser = SecurityUtils.getCurrentUserLogin();
                 User user = userRepository.findByPhoneNumber(currentUser).orElse(null);
@@ -97,7 +97,7 @@ public class LandDetailsController {
         ResponseVO<CompleteLandDetailsOutDTO> responseVO = new ResponseVO<>();
         List<CompleteLandDetailsOutDTO> resultList = new ArrayList<>();
         try {
-            CompleteLandDetailsOutDTO completeLandDetailsDTO = landDetailsService.findById(id);
+            CompleteLandDetailsOutDTO completeLandDetailsDTO = landDetailsService.findCompleteLandDetailsById(id);
             if (completeLandDetailsDTO != null) {
                 String currentUser = SecurityUtils.getCurrentUserLogin();
                 User user = userRepository.findByPhoneNumber(currentUser).orElse(null);
@@ -139,11 +139,21 @@ public class LandDetailsController {
             return responseVO;
         }
 
+        boolean hasInvalidMobile = completeLandDetailsInDTO.getLandOwners().stream()
+                .filter(Objects::nonNull)
+                .anyMatch(owner -> owner.getMobile() == null);
+
+        if (hasInvalidMobile) {
+            responseVO.setStatus(400);
+            responseVO.setMessage("Invalid mobile number for the given LandOwners.");
+            return responseVO;
+        }
+
         List<CompleteLandDetailsOutDTO> resultList = new ArrayList<>();
 
         try {
 
-            CompleteLandDetailsOutDTO savedLandDetails = landDetailsService.save(completeLandDetailsInDTO);
+            CompleteLandDetailsOutDTO savedLandDetails = landDetailsService.saveCompleteLandDetails(completeLandDetailsInDTO);
             resultList.add(savedLandDetails);
             responseVO.setStatus(201);
             responseVO.setMessage("Land details created successfully.");

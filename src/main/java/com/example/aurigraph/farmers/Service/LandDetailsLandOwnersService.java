@@ -23,4 +23,6 @@ public interface LandDetailsLandOwnersService {
     List<LandDetailsLandOwners> findByLandDetailsId(Long id);
 
     Optional<LandDetailsLandOwners> findByLandDetailsIdAndLandOwnerId(Long landDetailsId, Long landOwnerId);
+
+    List<LandDetailsLandOwners> findByLandOwnerId(Long landOwnerId);
 }

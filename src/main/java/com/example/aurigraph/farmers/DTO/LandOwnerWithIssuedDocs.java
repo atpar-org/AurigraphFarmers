@@ -1,51 +1,31 @@
-package com.example.aurigraph.farmers.Domain;
+package com.example.aurigraph.farmers.DTO;
 
-import com.example.aurigraph.farmers.AbstractAuditingEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.*;
-import org.springframework.web.multipart.MultipartFile;
+import jakarta.persistence.Column;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-@Entity
-@Table(name = "land_owner")
-public class LandOwner extends AbstractAuditingEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class LandOwnerWithIssuedDocs {
     private Long id;
 
-
-
-    @Column(name = "landowner_name")
     private String landownerName;  // Landowner Name
 
-    @Column(name = "signature")
     private String signature;  // Landowner Signature
 
-
-    @Column(name = "date", nullable = true)
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;  // Date of landowner record
 
-    @Column(name = "email")
     private String email;  // Email
 
-    @Column(name = "mobile")
     private String mobile;  // Mobile Number
 
-
-
-
-    @Column(name = "aadhaar")
     private String aadhaar;
 
     private String imageUrl;
 
-    @Column(name = "address")
     private String address;
+
+    private List<IssuedDocumentDTO> issuedDocuments;
 
     public Long getId() {
         return id;
@@ -53,14 +33,6 @@ public class LandOwner extends AbstractAuditingEntity {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getAadhaar() {
-        return aadhaar;
-    }
-
-    public void setAadhaar(String aadhaar) {
-        this.aadhaar = aadhaar;
     }
 
     public String getLandownerName() {
@@ -77,14 +49,6 @@ public class LandOwner extends AbstractAuditingEntity {
 
     public void setSignature(String signature) {
         this.signature = signature;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public LocalDate getDate() {
@@ -111,11 +75,35 @@ public class LandOwner extends AbstractAuditingEntity {
         this.mobile = mobile;
     }
 
+    public String getAadhaar() {
+        return aadhaar;
+    }
+
+    public void setAadhaar(String aadhaar) {
+        this.aadhaar = aadhaar;
+    }
+
     public String getImageUrl() {
         return imageUrl;
     }
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public List<IssuedDocumentDTO> getIssuedDocuments() {
+        return issuedDocuments;
+    }
+
+    public void setIssuedDocuments(List<IssuedDocumentDTO> issuedDocuments) {
+        this.issuedDocuments = issuedDocuments;
     }
 }

@@ -20,7 +20,7 @@ public class FilesManager {
     @Value("${server.url}")
     private String serverUrl;
 
-    public  String saveFile(MultipartFile file,String imageFolder1, String imageFolder2,String entityName, String entityId,  String doc, String fileType) throws IOException {
+    public  String saveFile(MultipartFile file, String entityName, String entityId,  String doc, String fileType) throws IOException {
 
 
         // Replace spaces with underscores in the entityName, imageType, and table
@@ -32,7 +32,7 @@ public class FilesManager {
         // Use the base directory with the correct separator
         String baseDir = System.getProperty("user.dir") + File.separator + "src" + File.separator +
                 "main" + File.separator + "resources" + File.separator + "static" +
-                File.separator + "content" + File.separator+ imageFolder1+ File.separator + imageFolder2+ File.separator + entityName + File.separator + entityId + File.separator + doc ;
+                File.separator + "content" + File.separator + entityName + File.separator + entityId + File.separator + doc ;
 
         File dir = new File(baseDir);
 
@@ -51,8 +51,8 @@ public class FilesManager {
         }
 
         // Construct the relative path for saving the file
-        String path = "content" + "/" + imageFolder1 + "/" + imageFolder2+ "/"+ entityName + "/" + entityId + "/" + doc + "/" + fileName;
-        String targetFilePath = "content"+ File.separator+ imageFolder1 + File.separator + imageFolder2 + File.separator + entityName +  File.separator + entityId + File.separator + doc + File.separator + fileName;
+        String path = "content" + "/"+ entityName + "/" + entityId + "/" + doc + "/" + fileName;
+        String targetFilePath = "content"+ File.separator + entityName +  File.separator + entityId + File.separator + doc + File.separator + fileName;
 
         // Use try-with-resources to ensure streams are closed properly
         try (InputStream inputStream = file.getInputStream();

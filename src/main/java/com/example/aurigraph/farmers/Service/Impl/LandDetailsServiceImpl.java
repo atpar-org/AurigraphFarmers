@@ -12,11 +12,9 @@ import com.example.aurigraph.farmers.Repository.LandDetailsLandOwnersRepository;
 import com.example.aurigraph.farmers.Repository.LandDetailsRepository;
 import com.example.aurigraph.farmers.Repository.LandOwnerRepository;
 import com.example.aurigraph.farmers.Security.SecurityUtils;
-import com.example.aurigraph.farmers.Service.LandDetailsLandOwnersService;
-import com.example.aurigraph.farmers.Service.LandDetailsService;
+import com.example.aurigraph.farmers.Service.*;
 //import com.example.aurigraph.farmers.Service.PropertyDetailsService;
-import com.example.aurigraph.farmers.Service.LandOwnerDocsService;
-import com.example.aurigraph.farmers.Service.WitnessService;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,13 +40,14 @@ public class LandDetailsServiceImpl implements LandDetailsService {
     private final FilesManager filesManager;
 //    private final PropertyMapping propertyMapping;
     private final WitnessMapping witnessMapping;
-private final LandOwnerDocsService landOwnerDocsService;
+    private final LandOwnerDocsService landOwnerDocsService;
+    private final UserService userService;
 
     public LandDetailsServiceImpl(LandDetailsRepository landDetailsRepository,
                                   LandOwnerRepository landOwnerRepository,
                                   LandDetailsLandOwnersService landDetailsLandOwnersService,
                                   LandDetailsMapping landDetailsMapping,
-                                  WitnessService witnessService, LandOwnerMapping landOwnerMapping, FilesManager filesManager, WitnessMapping witnessMapping, LandOwnerDocsService landOwnerDocsService) {
+                                  WitnessService witnessService, LandOwnerMapping landOwnerMapping, FilesManager filesManager, WitnessMapping witnessMapping, LandOwnerDocsService landOwnerDocsService, UserService userService) {
         this.landDetailsRepository = landDetailsRepository;
         this.landOwnerRepository = landOwnerRepository;
         this.landDetailsLandOwnersService = landDetailsLandOwnersService;
@@ -59,32 +58,48 @@ private final LandOwnerDocsService landOwnerDocsService;
         this.filesManager = filesManager;
         this.witnessMapping = witnessMapping;
         this.landOwnerDocsService = landOwnerDocsService;
+        this.userService = userService;
+
     }
 
     @Override
-    public List<CompleteLandDetailsOutDTO> findAll() {
+    public List<CompleteLandDetailsOutDTO> findAllCompleteLandDetails(Long userId) {
+
+        Optional<User> user = userService.findById(userId);
+        if (user.isEmpty()) {
+            throw new EntityNotFoundException("user not found");
+        }
+        Optional<LandOwner> landOwner = landOwnerRepository.findByMobile(user.get().getPhoneNumber());
+        if (landOwner.isEmpty()) {
+            throw new EntityNotFoundException("landOwner not found");
+        }
+        List<LandDetailsLandOwners> landOwnerLandDetailAssociations =landDetailsLandOwnersService.findByLandOwnerId(landOwner.get().getId());
+
+
         logger.info("Fetching all land details");
-        List<LandDetails> landDetails = (List<LandDetails>) landDetailsRepository.findAll();
-        logger.debug("Found {} land details", landDetails.size());
 
         List<CompleteLandDetailsOutDTO> completeLandDetails = new ArrayList<>();
-        for (LandDetails landDetail : landDetails) {
-            logger.debug("Processing land detail with ID: {}", landDetail.getId());
+        for (LandDetailsLandOwners landOwnerLandDetailAssociation : landOwnerLandDetailAssociations) {
+            Optional<LandDetails> landDetail = landDetailsRepository.findById(landOwnerLandDetailAssociation.getLandDetailsId());
+            if (landDetail.isEmpty()) {
+                throw new EntityNotFoundException("landDetail not found");
+            }
+            logger.debug("Processing land detail with ID: {}", landDetail.get().getId());
 
-            CompleteLandDetailsOutDTO completeLandDetailsDTO = landDetailsMapping.domainToDTO(landDetail);
+            CompleteLandDetailsOutDTO completeLandDetailsDTO = landDetailsMapping.domainToDTO(landDetail.get());
             List<LandOwner> landOwners = new ArrayList<>();
 
-            List<LandDetailsLandOwners> landDetailsLandOwners = landDetailsLandOwnersService.findByLandDetailsId(landDetail.getId());
+            List<LandDetailsLandOwners> landDetailsLandOwners = landDetailsLandOwnersService.findByLandDetailsId(landDetail.get().getId());
             for (LandDetailsLandOwners landDetailsLandOwner : landDetailsLandOwners) {
-                LandOwner landOwner = landOwnerRepository.findById(landDetailsLandOwner.getLandOwnerId()).orElse(null);
-                if (landOwner != null) {
-                    landOwners.add(landOwner);
+                LandOwner landRecordlandOwner = landOwnerRepository.findById(landDetailsLandOwner.getLandOwnerId()).orElse(null);
+                if (landRecordlandOwner != null) {
+                    landOwners.add(landRecordlandOwner);
                 }
             }
 
 
-            List<Witness> witnesses = witnessService.findByLandDetailsId(landDetail.getId());
-            List<LandOwnerWithDocs> landOwnerWithDocs = landOwnerMapping.domainToOutDTO(landOwners);
+            List<Witness> witnesses = witnessService.findByLandDetailsId(landDetail.get().getId());
+            List<LandOwnerWithDocs> landOwnerWithDocs = landOwnerMapping.domainsToOutDTOs(landOwners);
             completeLandDetailsDTO.setLandOwners(landOwnerWithDocs);
             completeLandDetailsDTO.setWitnesses(witnesses);
 
@@ -96,12 +111,12 @@ private final LandOwnerDocsService landOwnerDocsService;
     }
 
     @Override
-    public Optional<LandDetails> findLandDetailsById(Long id) {
+    public Optional<LandDetails> findById(Long id) {
         return  landDetailsRepository.findById(id);
     }
 
     @Override
-    public CompleteLandDetailsOutDTO findById(Long id) {
+    public CompleteLandDetailsOutDTO findCompleteLandDetailsById(Long id) {
         logger.info("Fetching land details with ID: {}", id);
         LandDetails landDetail = landDetailsRepository.findById(id).orElse(null);
         if (landDetail == null) {
@@ -115,14 +130,11 @@ private final LandOwnerDocsService landOwnerDocsService;
         List<LandOwner> landOwners = new ArrayList<>();
         List<LandDetailsLandOwners> landDetailsLandOwners = landDetailsLandOwnersService.findByLandDetailsId(landDetail.getId());
         for (LandDetailsLandOwners landDetailsLandOwner : landDetailsLandOwners) {
-            LandOwner landOwner = landOwnerRepository.findById(landDetailsLandOwner.getLandOwnerId()).orElse(null);
-            if (landOwner != null) {
-                landOwners.add(landOwner);
-            }
+            landOwnerRepository.findById(landDetailsLandOwner.getLandOwnerId()).ifPresent(landOwners::add);
         }
 
         List<Witness> witnesses = witnessService.findByLandDetailsId(landDetail.getId());
-        List<LandOwnerWithDocs> landOwnerWithDocs = landOwnerMapping.domainToOutDTO(landOwners);
+        List<LandOwnerWithDocs> landOwnerWithDocs = landOwnerMapping.domainsToOutDTOs(landOwners);
         completeLandDetailsDTO.setLandOwners(landOwnerWithDocs);
         completeLandDetailsDTO.setWitnesses(witnesses);
         logger.info("Completed fetching land details for ID: {}", id);
@@ -130,7 +142,7 @@ private final LandOwnerDocsService landOwnerDocsService;
     }
 
     @Override
-    public CompleteLandDetailsOutDTO save(CompleteLandDetailsInDTO completeLandDetailsInDTO) throws IOException {
+    public CompleteLandDetailsOutDTO saveCompleteLandDetails(CompleteLandDetailsInDTO completeLandDetailsInDTO) throws IOException {
         logger.info("Saving new land details");
 
         // Save LandDetails
@@ -148,7 +160,7 @@ private final LandOwnerDocsService landOwnerDocsService;
 
                 try{
                     if(bankDetailsUpload!=null){
-                        bankUploadPath = filesManager.saveFile(bankDetailsUpload,"LandDetails","LandDetails-"+savedLandDetails.getId(),"Details", "BankDetails","BankDetails_"+savedLandDetails.getId() , bankDetailsUpload.getContentType());
+                        bankUploadPath = filesManager.saveFile(bankDetailsUpload,"LandDetails","LandDetails-" + savedLandDetails.getId(),"BankDetails_"+savedLandDetails.getId() , bankDetailsUpload.getContentType());
                     }
                 }
                 catch(Exception e){
@@ -224,7 +236,7 @@ private final LandOwnerDocsService landOwnerDocsService;
 
         // Map back to DTO for response
             CompleteLandDetailsOutDTO responseDTO = landDetailsMapping.domainToDTO(savedLandDetails);
-            List<LandOwnerWithDocs> landOwnerWithDocs = landOwnerMapping.domainToOutDTO(allLandOwners);
+            List<LandOwnerWithDocs> landOwnerWithDocs = landOwnerMapping.domainsToOutDTOs(allLandOwners);
             responseDTO.setLandOwners(landOwnerWithDocs);
             responseDTO.setWitnesses(savedWitnesses);
 
@@ -277,7 +289,7 @@ private final LandOwnerDocsService landOwnerDocsService;
 
 
     @Override
-    public List<CompleteLandDetailsOutDTO> findByUserId(Integer userId) {
+    public List<CompleteLandDetailsOutDTO> findCompleteLandDetailsByUserId(Long userId) {
         logger.info("Fetching all land details");
 
 
@@ -300,7 +312,7 @@ private final LandOwnerDocsService landOwnerDocsService;
             }
 
             List<Witness> witnesses = witnessService.findByLandDetailsId(landDetail.getId());
-            List<LandOwnerWithDocs> landOwnerWithDocs = landOwnerMapping.domainToOutDTO(landOwners);
+            List<LandOwnerWithDocs> landOwnerWithDocs = landOwnerMapping.domainsToOutDTOs(landOwners);
             completeLandDetailsDTO.setLandOwners(landOwnerWithDocs);
             completeLandDetailsDTO.setWitnesses(witnesses);
 
