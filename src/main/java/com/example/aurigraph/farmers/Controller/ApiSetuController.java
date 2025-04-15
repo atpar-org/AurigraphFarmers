@@ -37,6 +37,7 @@ public class ApiSetuController {
     @Autowired
     private LandOwnerRepository landOwnerRepository;
 
+    @Autowired
     private LandOwnerMapping landOwnerMapping;
 
     @GetMapping("/auth-and-getDocs")
@@ -112,19 +113,25 @@ public class ApiSetuController {
             apiSetuService.saveAccessToken(user.get().getPhoneNumber(), accessToken, refreshToken, expiresIn);
 
             List<IssuedDocumentDTO> issuedDocuments = fetchIssuedDocs(accessToken);
-
-            for(IssuedDocumentDTO issuedDocumentDTO : issuedDocuments){
-                if ("ADHAR".equalsIgnoreCase(issuedDocumentDTO.getDoctype())) {
-                    AadhaarDetailsDTO aadhaarDetailsDTO = apiSetuService.getDigiLockerAadhaarDocsByUri(issuedDocumentDTO.getUri(), issuedDocumentDTO.getDoctype(), landOwner.getMobile());
+            int aadharIndex = -1;
+            for(int i =0 ; i<issuedDocuments.toArray().length;i++){
+                if ("ADHAR".equalsIgnoreCase(issuedDocuments.get(i).getDoctype())) {
+                    AadhaarDetailsDTO aadhaarDetailsDTO = apiSetuService.getDigiLockerAadhaarDocsByUri(issuedDocuments.get(i).getUri(), issuedDocuments.get(i).getDoctype(), landOwner.getMobile());
                     if(aadhaarDetailsDTO!=null){
-                      landOwner = landOwnerMapping.saveLandOwnerByAadhaarDetails(aadhaarDetailsDTO,issuedDocumentDTO.getDoctype(),landOwner);
+                      landOwner = landOwnerMapping.saveLandOwnerByAadhaarDetails(aadhaarDetailsDTO,issuedDocuments.get(i).getDoctype(),landOwner);
+                      aadharIndex=i;
 
                     }
                 }
             }
+            if(aadharIndex!=-1){
+                issuedDocuments.remove(issuedDocuments.get(aadharIndex));
+            }
 
             LandOwnerWithIssuedDocs landOwnerWithIssuedDocs =landOwnerMapping.domainToDTO(landOwner);
-            landOwnerWithIssuedDocs.setIssuedDocuments(issuedDocuments);
+            if(issuedDocuments.size()>0){
+                landOwnerWithIssuedDocs.setIssuedDocuments(issuedDocuments);
+            }
             responseVO.setStatus(200);
             responseVO.setMessage("Success");
             responseVO.setData(Collections.singletonList(landOwnerWithIssuedDocs));
