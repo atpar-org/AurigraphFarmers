@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  mysqldbauri:
+    image: mysql:8.0.30
+    container_name: acm-db
+    restart: always
+    ports:
+      - "${MYSQL_PORT}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - mysqldata:/var/lib/mysql
+
+
+  backend:
+    image: shivain22/aurigraph-farmers-app:v18
+    container_name: acm-backend
+    restart: always
+    ports:
+      - "${BACKEND_PORT}:{SERVER_PORT}"
+    environment:
+      SPRING_APPLICATION_NAME: ${SPRING_APPLICATION_NAME}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldbauri:3306/${MYSQL_DATABASE}?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+      SECURITY_JWT_SECRET_KEY: ${SECURITY_JWT_SECRET_KEY}
+      SECURITY_JWT_EXPIRATION-TIME: ${SECURITY_JWT_EXPIRATION-TIME}
+      SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE: ${SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE}
+      SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE: ${SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE}
+      SPRING_SERVLET_MULTIPART_ENABLED: ${SPRING_SERVLET_MULTIPART_ENABLED}
+      SPRING_DATA_REDIS_HOST: ${SPRING_DATA_REDIS_HOST}
+      SPRING_DATA_REDIS_PORT: ${SPRING_DATA_REDIS_PORT}
+      aurigraph.farmers.openapi.dev-url: ${AURIGRAPH_FARMERS_OPENAPI_DEV_URL}
+      app.file.target.dir: ${APP_FILE_TARGET_DIR}
+      resource.location: ${RESOURCE_LOCATION}
+      twilio.account.sid: ${TWILIO_ACCOUNT_SID}
+      twilio.auth.token: ${TWILIO_AUTH_TOKEN}
+      twilio.phone.number: ${TWILIO_PHONE_NUMBER}
+      digiLocker.client.id: ${DIGILOCKER_CLIENT_ID}
+      digiLocker.client.secret: ${DIGILOCKER_CLIENT_SECRET}
+      digiLocker.redirect.uri: ${DIGILOCKER_REDIRECT_URI}
+      digiLocker.token.url: ${DIGILOCKER_TOKEN_URL}
+      digiLocker.docs.url.issued: ${DIGILOCKER_DOCS_URL_ISSUED}
+      digiLocker.docs.url.e-aadhaar: ${DIGILOCKER_DOCS_URL_E-AADHAAR}
+      digiLocker.docs.by.uri: ${DIGILOCKER_DOCS_BY_URI}
+      server.url: ${SERVER_URL}
+      server.port: ${SERVER_PORT}
+      digilocker.revoke: ${DIGILOCKER_REVOKE}
+
+
+    volumes:
+      - ./data/acm-content:/mnt/content
+  # ACM Frontend
+  frontend:
+    image: shivain22/farmer-auri:v5.2
+    container_name: acm-frontend
+    restart: always
+    ports:
+      - "3005:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      NEXT_PUBLIC_OFBIZ_API_URL: ${NEXT_PUBLIC_OFBIZ_API_URL}
+
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - "${REDIS_PORT}:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+
+volumes:
+  mysqldata:
+  redisdata:
